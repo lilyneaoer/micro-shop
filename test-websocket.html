@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Test</title>
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>WebSocket Connection Test</h1>
+  <div id="status">Connecting...</div>
+  <div id="log"></div>
+
+  <script>
+    const log = document.getElementById('log');
+    const status = document.getElementById('status');
+
+    function addLog(message) {
+      const p = document.createElement('p');
+      p.textContent = new Date().toLocaleTimeString() + ': ' + message;
+      log.appendChild(p);
+    }
+
+    // Get JWT token (you need to login first)
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjaGFudElkIjoiMmQzZGM3ZTUtY2QyYy00NzFlLWE1NGUtY2E0NmVmYTVhNTJlIiwidXNlcm5hbWUiOiJhZG1pbiIsImlhdCI6MTc3NjQ0NDcxMCwiZXhwIjoxNzc2NTMxMTEwfQ.Pp3vEBjf4iyGkERt_BJEyryL_D93CwjfFfIPxt3gcqc';
+
+    const socket = io('http://localhost:7001', {
+      auth: {
+        token: token
+      },
+      transports: ['websocket', 'polling']
+    });
+
+    socket.on('connect', () => {
+      status.textContent = 'Connected!';
+      status.style.color = 'green';
+      addLog('Connected to WebSocket server');
+    });
+
+    socket.on('authenticated', (data) => {
+      addLog('Authenticated: ' + JSON.stringify(data));
+    });
+
+    socket.on('error', (error) => {
+      addLog('Error: ' + JSON.stringify(error));
+    });
+
+    socket.on('disconnect', () => {
+      status.textContent = 'Disconnected';
+      status.style.color = 'red';
+      addLog('Disconnected from server');
+    });
+
+    socket.on('order:status_changed', (data) => {
+      addLog('Order status changed: ' + JSON.stringify(data));
+    });
+
+    socket.on('order:new', (data) => {
+      addLog('New order: ' + JSON.stringify(data));
+    });
+  </script>
+</body>
+</html>

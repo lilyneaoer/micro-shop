@@ -1,0 +1,15 @@
+{
+  "miniprogramRoot": "dist",
+  "projectname": "merchant-app",
+  "description": "商家移动端 - 扫码点餐系统",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "enhance": true,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
+}

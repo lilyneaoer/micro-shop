@@ -1,0 +1,15 @@
+{
+  "miniprogramRoot": "dist",
+  "projectname": "customer-app",
+  "description": "顾客小程序 - 扫码点餐系统",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "enhance": true,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
+}

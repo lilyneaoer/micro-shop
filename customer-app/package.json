@@ -1,0 +1,70 @@
+{
+  "name": "customer-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "顾客小程序 - 扫码点餐系统",
+  "templateInfo": {
+    "name": "vue3",
+    "typescript": true,
+    "css": "Less"
+  },
+  "scripts": {
+    "build:weapp": "taro build --type weapp",
+    "build:weapp:watch": "npm run build:weapp -- --watch",
+    "dev:weapp": "npm run build:weapp -- --watch",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "lint": "eslint --ext .vue,.js,.ts src",
+    "lint:fix": "eslint --fix --ext .vue,.js,.ts src"
+  },
+  "browserslist": [
+    "last 3 versions",
+    "Android >= 4.1",
+    "ios >= 8"
+  ],
+  "author": "",
+  "dependencies": {
+    "@babel/runtime": "^7.21.5",
+    "@tarojs/components": "^4.0.7",
+    "@tarojs/helper": "^4.0.7",
+    "@tarojs/plugin-framework-vue3": "^4.0.7",
+    "@tarojs/plugin-html": "^4.0.7",
+    "@tarojs/plugin-platform-weapp": "^4.0.7",
+    "@tarojs/runtime": "^4.0.7",
+    "@tarojs/shared": "^4.0.7",
+    "@tarojs/taro": "^4.0.7",
+    "pinia": "^2.1.7",
+    "socket.io-client": "^4.7.5",
+    "taro-ui-vue3": "^1.0.0-alpha.21",
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.0",
+    "@tarojs/cli": "^4.0.7",
+    "@tarojs/vite-runner": "^4.0.7",
+    "@types/node": "^18.15.11",
+    "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "@typescript-eslint/parser": "^5.20.0",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "@vitejs/plugin-vue-jsx": "^5.1.5",
+    "@vue/babel-plugin-jsx": "^1.1.1",
+    "@vue/compiler-sfc": "^3.0.0",
+    "@vue/test-utils": "^2.4.1",
+    "babel-preset-taro": "^4.0.7",
+    "eslint": "^8.12.0",
+    "eslint-config-taro": "^4.0.7",
+    "eslint-plugin-vue": "^9.0.0",
+    "fast-check": "^4.7.0",
+    "jsdom": "^22.1.0",
+    "less": "^4.1.3",
+    "postcss": "^8.4.18",
+    "stylelint": "^14.4.0",
+    "tsconfig-paths-webpack-plugin": "^4.0.0",
+    "typescript": "^5.1.0",
+    "vite": "^5.0.0",
+    "vitest": "^0.34.6"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
