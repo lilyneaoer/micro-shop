@@ -38,7 +38,7 @@
       <!-- 顶部导航 -->
       <el-header class="layout-header">
         <span class="page-title">{{ currentTitle }}</span>
-        <el-button type="text" @click="handleLogout">退出登录</el-button>
+        <el-button link @click="handleLogout">退出登录</el-button>
       </el-header>
 
       <!-- 内容区 -->
@@ -53,6 +53,7 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
+import { DataLine, Grid, Food, List, TrendCharts } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()

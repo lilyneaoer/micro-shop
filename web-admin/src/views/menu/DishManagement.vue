@@ -205,7 +205,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import type { FormInstance, FormRules, UploadFile } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Delete, Picture } from '@element-plus/icons-vue'
@@ -414,6 +414,8 @@ async function handleDishSubmit() {
     }
 
     dishDialogVisible.value = false
+    // 刷新列表，保持筛选条件
+    await handleCategoryFilter()
   } catch (err: unknown) {
     ElMessage.error(err instanceof Error ? err.message : '操作失败')
   } finally {
@@ -426,6 +428,8 @@ async function handleToggleAvailable(dish: Dish, val: boolean) {
   try {
     await menuStore.updateDish(dish.id, { isAvailable: val })
     ElMessage.success(val ? '已上架' : '已下架')
+    // 刷新列表，保持筛选条件
+    await handleCategoryFilter()
   } catch (err: unknown) {
     ElMessage.error(err instanceof Error ? err.message : '操作失败')
   } finally {
@@ -446,6 +450,8 @@ async function handleDeleteDish(dish: Dish) {
   try {
     await menuStore.deleteDish(dish.id)
     ElMessage.success('删除成功')
+    // 刷新列表，保持筛选条件
+    await handleCategoryFilter()
   } catch (err: unknown) {
     ElMessage.error(err instanceof Error ? err.message : '删除失败')
   }
@@ -460,6 +466,13 @@ async function handleCategoryFilter() {
     ElMessage.error(menuStore.error ?? '获取菜品列表失败')
   }
 }
+
+// ─── 初始化 ───────────────────────────────────────────────────────────────────
+
+onMounted(async () => {
+  // 组件挂载时获取菜品列表
+  await handleCategoryFilter()
+})
 </script>
 
 <style scoped>
