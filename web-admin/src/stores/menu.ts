@@ -40,7 +40,8 @@ export const useMenuStore = defineStore('menu', () => {
    */
   async function createCategory(params: { name: string; sortOrder?: number }): Promise<Category> {
     const newCategory = await menuApi.createCategory(params)
-    categories.value.push(newCategory)
+    // 重新获取分类列表以确保数据一致性
+    await fetchCategories()
     return newCategory
   }
 
@@ -52,10 +53,8 @@ export const useMenuStore = defineStore('menu', () => {
     params: { name?: string; sortOrder?: number },
   ): Promise<Category> {
     const updated = await menuApi.updateCategory(id, params)
-    const index = categories.value.findIndex((c) => c.id === id)
-    if (index !== -1) {
-      categories.value[index] = updated
-    }
+    // 重新获取分类列表以确保数据一致性
+    await fetchCategories()
     return updated
   }
 
@@ -64,7 +63,8 @@ export const useMenuStore = defineStore('menu', () => {
    */
   async function deleteCategory(id: string): Promise<void> {
     await menuApi.deleteCategory(id)
-    categories.value = categories.value.filter((c) => c.id !== id)
+    // 重新获取分类列表以确保数据一致性
+    await fetchCategories()
   }
 
   // ─── 菜品操作 ──────────────────────────────────────────────────────────────

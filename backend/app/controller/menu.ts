@@ -34,10 +34,14 @@ export default class MenuController extends Controller {
     const { ctx } = this;
     const merchantId = ctx.state.merchantId;
 
-    const { name, sort_order } = ctx.request.body as {
+    const { name, sort_order, sortOrder } = ctx.request.body as {
       name?: string;
       sort_order?: number;
+      sortOrder?: number;
     };
+
+    // Support both snake_case and camelCase for sort_order
+    const sortOrderValue = sort_order ?? sortOrder;
 
     // Validation
     if (!name || typeof name !== 'string' || name.trim() === '') {
@@ -46,7 +50,7 @@ export default class MenuController extends Controller {
       return;
     }
 
-    if (sort_order !== undefined && (typeof sort_order !== 'number' || sort_order < 0)) {
+    if (sortOrderValue !== undefined && (typeof sortOrderValue !== 'number' || sortOrderValue < 0)) {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '排序值必须为非负整数');
       return;
@@ -54,7 +58,7 @@ export default class MenuController extends Controller {
 
     const category = await ctx.service.menu.createCategory(merchantId, {
       name: name.trim(),
-      sort_order,
+      sort_order: sortOrderValue,
     });
 
     ctx.status = 201;
@@ -71,10 +75,14 @@ export default class MenuController extends Controller {
     const merchantId = ctx.state.merchantId;
     const categoryId = ctx.params.id;
 
-    const { name, sort_order } = ctx.request.body as {
+    const { name, sort_order, sortOrder } = ctx.request.body as {
       name?: string;
       sort_order?: number;
+      sortOrder?: number;
     };
+
+    // Support both snake_case and camelCase for sort_order
+    const sortOrderValue = sort_order ?? sortOrder;
 
     // Validation
     if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
@@ -83,7 +91,7 @@ export default class MenuController extends Controller {
       return;
     }
 
-    if (sort_order !== undefined && (typeof sort_order !== 'number' || sort_order < 0)) {
+    if (sortOrderValue !== undefined && (typeof sortOrderValue !== 'number' || sortOrderValue < 0)) {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '排序值必须为非负整数');
       return;
@@ -91,7 +99,7 @@ export default class MenuController extends Controller {
 
     const category = await ctx.service.menu.updateCategory(merchantId, categoryId, {
       name: name?.trim(),
-      sort_order,
+      sort_order: sortOrderValue,
     });
 
     if (!category) {

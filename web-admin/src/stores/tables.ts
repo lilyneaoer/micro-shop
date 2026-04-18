@@ -32,7 +32,8 @@ export const useTablesStore = defineStore('tables', () => {
    */
   async function createTable(params: CreateTableParams): Promise<Table> {
     const newTable = await tableApi.create(params)
-    tables.value.push(newTable)
+    // 重新获取桌台列表以确保数据一致性
+    await fetchTables()
     return newTable
   }
 
@@ -41,10 +42,8 @@ export const useTablesStore = defineStore('tables', () => {
    */
   async function updateTable(id: string, params: UpdateTableParams): Promise<Table> {
     const updated = await tableApi.update(id, params)
-    const index = tables.value.findIndex((t) => t.id === id)
-    if (index !== -1) {
-      tables.value[index] = updated
-    }
+    // 重新获取桌台列表以确保数据一致性
+    await fetchTables()
     return updated
   }
 
@@ -53,7 +52,8 @@ export const useTablesStore = defineStore('tables', () => {
    */
   async function deleteTable(id: string): Promise<void> {
     await tableApi.remove(id)
-    tables.value = tables.value.filter((t) => t.id !== id)
+    // 重新获取桌台列表以确保数据一致性
+    await fetchTables()
   }
 
   return {
