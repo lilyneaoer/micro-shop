@@ -154,10 +154,12 @@ export default class MenuController extends Controller {
     }
 
     const merchantId = ctx.state.merchantId;
-    const { category_id } = ctx.query as { category_id?: string };
+    // 支持 camelCase 和 snake_case 两种参数格式
+    const { category_id, categoryId } = ctx.query as { category_id?: string; categoryId?: string };
+    const finalCategoryId = categoryId || category_id;
 
     const dishes = await ctx.service.menu.getDishes(merchantId, {
-      categoryId: category_id,
+      categoryId: finalCategoryId,
       availableOnly: isCustomerRequest, // Only return available dishes for customers
     });
 
@@ -174,20 +176,46 @@ export default class MenuController extends Controller {
     const { ctx } = this;
     const merchantId = ctx.state.merchantId;
 
-    const { category_id, name, description, price, image_url, is_available, has_sku, sort_order } =
-      ctx.request.body as {
-        category_id?: string;
-        name?: string;
-        description?: string;
-        price?: number;
-        image_url?: string;
-        is_available?: boolean;
-        has_sku?: boolean;
-        sort_order?: number;
-      };
+    // 支持 camelCase 和 snake_case 两种参数格式
+    const {
+      category_id,
+      categoryId,
+      name,
+      description,
+      price,
+      image_url,
+      imageUrl,
+      is_available,
+      isAvailable,
+      has_sku,
+      hasSku,
+      sort_order,
+      sortOrder,
+    } = ctx.request.body as {
+      category_id?: string;
+      categoryId?: string;
+      name?: string;
+      description?: string;
+      price?: number;
+      image_url?: string;
+      imageUrl?: string;
+      is_available?: boolean;
+      isAvailable?: boolean;
+      has_sku?: boolean;
+      hasSku?: boolean;
+      sort_order?: number;
+      sortOrder?: number;
+    };
+
+    // 优先使用 camelCase，fallback 到 snake_case
+    const finalCategoryId = categoryId || category_id;
+    const finalImageUrl = imageUrl || image_url;
+    const finalIsAvailable = isAvailable !== undefined ? isAvailable : is_available;
+    const finalHasSku = hasSku !== undefined ? hasSku : has_sku;
+    const finalSortOrder = sortOrder !== undefined ? sortOrder : sort_order;
 
     // Validation
-    if (!category_id || typeof category_id !== 'string') {
+    if (!finalCategoryId || typeof finalCategoryId !== 'string') {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '分类ID不能为空');
       return;
@@ -205,21 +233,21 @@ export default class MenuController extends Controller {
       return;
     }
 
-    if (sort_order !== undefined && (typeof sort_order !== 'number' || sort_order < 0)) {
+    if (finalSortOrder !== undefined && (typeof finalSortOrder !== 'number' || finalSortOrder < 0)) {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '排序值必须为非负整数');
       return;
     }
 
     const dish = await ctx.service.menu.createDish(merchantId, {
-      category_id,
+      category_id: finalCategoryId,
       name: name.trim(),
       description,
       price,
-      image_url,
-      is_available,
-      has_sku,
-      sort_order,
+      image_url: finalImageUrl,
+      is_available: finalIsAvailable,
+      has_sku: finalHasSku,
+      sort_order: finalSortOrder,
     });
 
     if (!dish) {
@@ -242,17 +270,43 @@ export default class MenuController extends Controller {
     const merchantId = ctx.state.merchantId;
     const dishId = ctx.params.id;
 
-    const { category_id, name, description, price, image_url, is_available, has_sku, sort_order } =
-      ctx.request.body as {
-        category_id?: string;
-        name?: string;
-        description?: string;
-        price?: number;
-        image_url?: string;
-        is_available?: boolean;
-        has_sku?: boolean;
-        sort_order?: number;
-      };
+    // 支持 camelCase 和 snake_case 两种参数格式
+    const {
+      category_id,
+      categoryId,
+      name,
+      description,
+      price,
+      image_url,
+      imageUrl,
+      is_available,
+      isAvailable,
+      has_sku,
+      hasSku,
+      sort_order,
+      sortOrder,
+    } = ctx.request.body as {
+      category_id?: string;
+      categoryId?: string;
+      name?: string;
+      description?: string;
+      price?: number;
+      image_url?: string;
+      imageUrl?: string;
+      is_available?: boolean;
+      isAvailable?: boolean;
+      has_sku?: boolean;
+      hasSku?: boolean;
+      sort_order?: number;
+      sortOrder?: number;
+    };
+
+    // 优先使用 camelCase，fallback 到 snake_case
+    const finalCategoryId = categoryId || category_id;
+    const finalImageUrl = imageUrl || image_url;
+    const finalIsAvailable = isAvailable !== undefined ? isAvailable : is_available;
+    const finalHasSku = hasSku !== undefined ? hasSku : has_sku;
+    const finalSortOrder = sortOrder !== undefined ? sortOrder : sort_order;
 
     // Validation
     if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
@@ -267,21 +321,21 @@ export default class MenuController extends Controller {
       return;
     }
 
-    if (sort_order !== undefined && (typeof sort_order !== 'number' || sort_order < 0)) {
+    if (finalSortOrder !== undefined && (typeof finalSortOrder !== 'number' || finalSortOrder < 0)) {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '排序值必须为非负整数');
       return;
     }
 
     const dish = await ctx.service.menu.updateDish(merchantId, dishId, {
-      category_id,
+      category_id: finalCategoryId,
       name: name?.trim(),
       description,
       price,
-      image_url,
-      is_available,
-      has_sku,
-      sort_order,
+      image_url: finalImageUrl,
+      is_available: finalIsAvailable,
+      has_sku: finalHasSku,
+      sort_order: finalSortOrder,
     });
 
     if (!dish) {

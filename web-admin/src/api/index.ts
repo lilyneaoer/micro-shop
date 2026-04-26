@@ -267,14 +267,7 @@ export const menuApi = {
 
   // 菜品
   listDishes: (params?: { categoryId?: string; isAvailable?: boolean }) =>
-    request.get<unknown, Dish[]>('/dishes', {
-      params: params
-        ? {
-            category_id: params.categoryId,
-            is_available: params.isAvailable,
-          }
-        : undefined,
-    }),
+    request.get<unknown, Dish[]>('/dishes', { params }),
 
   createDish: (params: Omit<Dish, 'id' | 'imageUrl' | 'skus' | 'createdAt' | 'updatedAt'>) =>
     request.post<unknown, Dish>('/dishes', params),
