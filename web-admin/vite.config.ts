@@ -34,6 +34,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path,
       },
+      // 代理静态文件（图片等）
+      '/public': {
+        target: 'http://localhost:7001',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
       // 代理 WebSocket 连接
       '/socket.io': {
         target: 'http://localhost:7001',

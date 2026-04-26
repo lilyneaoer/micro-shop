@@ -27,7 +27,7 @@
             :loading="downloadingId === row.id"
             @click="downloadQrcode(row)"
           >
-            下载二维码
+            二维码
           </el-button>
           <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
         </template>

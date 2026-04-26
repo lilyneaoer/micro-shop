@@ -191,6 +191,7 @@ export default class MenuController extends Controller {
       hasSku,
       sort_order,
       sortOrder,
+      skus,
     } = ctx.request.body as {
       category_id?: string;
       categoryId?: string;
@@ -205,6 +206,13 @@ export default class MenuController extends Controller {
       hasSku?: boolean;
       sort_order?: number;
       sortOrder?: number;
+      skus?: Array<{
+        name: string;
+        priceDelta?: number;
+        price_delta?: number;
+        isAvailable?: boolean;
+        is_available?: boolean;
+      }>;
     };
 
     // 优先使用 camelCase，fallback 到 snake_case
@@ -239,6 +247,13 @@ export default class MenuController extends Controller {
       return;
     }
 
+    // 转换 SKU 数据格式（camelCase -> snake_case）
+    const finalSkus = skus?.map(sku => ({
+      name: sku.name,
+      price_delta: sku.priceDelta ?? sku.price_delta ?? 0,
+      is_available: sku.isAvailable ?? sku.is_available ?? true,
+    }));
+
     const dish = await ctx.service.menu.createDish(merchantId, {
       category_id: finalCategoryId,
       name: name.trim(),
@@ -248,6 +263,7 @@ export default class MenuController extends Controller {
       is_available: finalIsAvailable,
       has_sku: finalHasSku,
       sort_order: finalSortOrder,
+      skus: finalSkus,
     });
 
     if (!dish) {
@@ -285,6 +301,7 @@ export default class MenuController extends Controller {
       hasSku,
       sort_order,
       sortOrder,
+      skus,
     } = ctx.request.body as {
       category_id?: string;
       categoryId?: string;
@@ -299,6 +316,13 @@ export default class MenuController extends Controller {
       hasSku?: boolean;
       sort_order?: number;
       sortOrder?: number;
+      skus?: Array<{
+        name: string;
+        priceDelta?: number;
+        price_delta?: number;
+        isAvailable?: boolean;
+        is_available?: boolean;
+      }>;
     };
 
     // 优先使用 camelCase，fallback 到 snake_case
@@ -327,6 +351,13 @@ export default class MenuController extends Controller {
       return;
     }
 
+    // 转换 SKU 数据格式（camelCase -> snake_case）
+    const finalSkus = skus?.map(sku => ({
+      name: sku.name,
+      price_delta: sku.priceDelta ?? sku.price_delta ?? 0,
+      is_available: sku.isAvailable ?? sku.is_available ?? true,
+    }));
+
     const dish = await ctx.service.menu.updateDish(merchantId, dishId, {
       category_id: finalCategoryId,
       name: name?.trim(),
@@ -336,6 +367,7 @@ export default class MenuController extends Controller {
       is_available: finalIsAvailable,
       has_sku: finalHasSku,
       sort_order: finalSortOrder,
+      skus: finalSkus,
     });
 
     if (!dish) {
@@ -444,7 +476,7 @@ export default class MenuController extends Controller {
       fs.writeFileSync(filepath, compressedBuffer);
 
       // Generate URL (in production, this would be the object storage URL)
-      const imageUrl = `/uploads/dishes/${filename}`;
+      const imageUrl = `/public/uploads/dishes/${filename}`;
 
       // Update dish with new image URL
       await ctx.service.menu.updateDish(merchantId, dishId, {

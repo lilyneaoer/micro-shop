@@ -21,6 +21,11 @@ export interface CreateDishInput {
   is_available?: boolean;
   has_sku?: boolean;
   sort_order?: number;
+  skus?: Array<{
+    name: string;
+    price_delta: number;
+    is_available?: boolean;
+  }>;
 }
 
 export interface UpdateDishInput {
@@ -32,6 +37,11 @@ export interface UpdateDishInput {
   is_available?: boolean;
   has_sku?: boolean;
   sort_order?: number;
+  skus?: Array<{
+    name: string;
+    price_delta: number;
+    is_available?: boolean;
+  }>;
 }
 
 export default class MenuService extends Service {
@@ -150,6 +160,20 @@ export default class MenuService extends Service {
       sort_order: input.sort_order ?? 0,
     } as any);
 
+    // Create SKUs if provided
+    if (input.has_sku && input.skus && input.skus.length > 0) {
+      await Promise.all(
+        input.skus.map(sku =>
+          this.app.model.Sku.create({
+            dish_id: dish.id,
+            name: sku.name,
+            price_delta: sku.price_delta,
+            is_available: sku.is_available ?? true,
+          } as any),
+        ),
+      );
+    }
+
     return dish;
   }
 
@@ -170,6 +194,13 @@ export default class MenuService extends Service {
 
     const dishes = await this.app.model.Dish.findAll({
       where,
+      include: [
+        {
+          model: this.app.model.Sku,
+          as: 'skus',
+          required: false,
+        },
+      ],
       order: [
         ['sort_order', 'ASC'],
         ['created_at', 'ASC'],
@@ -188,6 +219,13 @@ export default class MenuService extends Service {
         id: dishId,
         merchant_id: merchantId,
       },
+      include: [
+        {
+          model: this.app.model.Sku,
+          as: 'skus',
+          required: false,
+        },
+      ],
     });
 
     return dish;
@@ -236,6 +274,29 @@ export default class MenuService extends Service {
     }
 
     await dish.save();
+
+    // Update SKUs if provided
+    if (input.skus !== undefined) {
+      // Delete existing SKUs
+      await this.app.model.Sku.destroy({
+        where: { dish_id: dishId },
+      });
+
+      // Create new SKUs
+      if (input.skus.length > 0) {
+        await Promise.all(
+          input.skus.map(sku =>
+            this.app.model.Sku.create({
+              dish_id: dishId,
+              name: sku.name,
+              price_delta: sku.price_delta,
+              is_available: sku.is_available ?? true,
+            } as any),
+          ),
+        );
+      }
+    }
+
     return dish;
   }
 

@@ -24,7 +24,7 @@
           <el-input
             v-model="form.username"
             placeholder="请输入用户名"
-            prefix-icon="User"
+            :prefix-icon="User"
             size="large"
             :disabled="loading"
           />
@@ -34,7 +34,7 @@
             v-model="form.password"
             type="password"
             placeholder="请输入密码"
-            prefix-icon="Lock"
+            :prefix-icon="Lock"
             size="large"
             show-password
             :disabled="loading"
@@ -59,6 +59,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { type FormInstance, type FormRules } from 'element-plus'
+import { User, Lock } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { ApiError } from '@/api'
 
@@ -71,8 +72,8 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 const form = reactive({
-  username: '',
-  password: '',
+  username: 'admin',
+  password: 'admin123',
 })
 
 const rules: FormRules = {
