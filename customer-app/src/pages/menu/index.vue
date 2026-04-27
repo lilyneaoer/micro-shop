@@ -117,6 +117,7 @@ import Taro from '@tarojs/taro'
 import { get } from '../../api'
 import { useCartStore } from '../../stores/cart'
 import { useSessionStore } from '../../stores/session'
+import { normalizeImageUrl } from '../../utils/image'
 
 /**
  * 分类接口
@@ -212,24 +213,27 @@ const groupedDishes = computed(() => {
 })
 
 /**
- * 加载分类列表
+ * 加载分类列表（从菜品数据中提取）
  */
-async function loadCategories() {
-  try {
-    const response = await get<Category[]>('/api/categories')
-    if (response.code === 0 && response.data) {
-      categories.value = response.data.sort((a, b) => a.sortOrder - b.sortOrder)
-      // 默认选中第一个分类
-      if (categories.value.length > 0) {
-        currentCategoryId.value = categories.value[0].id
-      }
+async function loadCategoriesFromDishes() {
+  // 从已加载的菜品中提取唯一的分类
+  const categoryMap = new Map<string, Category>()
+  
+  dishes.value.forEach((dish) => {
+    if (!categoryMap.has(dish.categoryId)) {
+      categoryMap.set(dish.categoryId, {
+        id: dish.categoryId,
+        name: `分类 ${categoryMap.size + 1}`, // 临时名称
+        sortOrder: categoryMap.size
+      })
     }
-  } catch (error) {
-    console.error('加载分类失败:', error)
-    Taro.showToast({
-      title: '加载分类失败',
-      icon: 'none'
-    })
+  })
+  
+  categories.value = Array.from(categoryMap.values())
+  
+  // 默认选中第一个分类
+  if (categories.value.length > 0) {
+    currentCategoryId.value = categories.value[0].id
   }
 }
 
@@ -241,8 +245,16 @@ async function loadDishes() {
     loading.value = true
     const response = await get<Dish[]>('/api/dishes')
     if (response.code === 0 && response.data) {
-      // 只显示上架的菜品
-      dishes.value = response.data.filter((dish) => dish.isAvailable)
+      // 只显示上架的菜品，并转换图片 URL
+      dishes.value = response.data
+        .filter((dish) => dish.isAvailable)
+        .map((dish) => ({
+          ...dish,
+          imageUrl: normalizeImageUrl(dish.imageUrl)
+        }))
+      
+      // 从菜品中提取分类信息
+      loadCategoriesFromDishes()
     }
   } catch (error) {
     console.error('加载菜品失败:', error)
@@ -342,8 +354,7 @@ onMounted(() => {
     return
   }
 
-  // 加载数据
-  loadCategories()
+  // 只需要加载菜品，分类会从菜品中提取
   loadDishes()
 })
 </script>

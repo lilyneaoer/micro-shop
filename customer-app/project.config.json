@@ -2,7 +2,7 @@
   "miniprogramRoot": "dist",
   "projectname": "customer-app",
   "description": "顾客小程序 - 扫码点餐系统",
-  "appid": "touristappid",
+  "appid": "wx648d5e4c375826a7",
   "setting": {
     "urlCheck": true,
     "es6": false,

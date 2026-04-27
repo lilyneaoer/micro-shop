@@ -8,12 +8,84 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import Taro, { onLoad } from '@tarojs/taro'
+import Taro, { useLoad, useRouter } from '@tarojs/taro'
 import { useSessionStore } from '../../stores/session'
 import { post, setSessionToken } from '../../api'
 
+const router = useRouter()
 const sessionStore = useSessionStore()
 const loadingText = ref('正在加载...')
+
+// 开发模式配置
+const DEV_MODE = true // 设置为 false 关闭开发模式
+const DEV_TABLE_NO = 'A01' // 开发模式默认桌号
+const DEV_QR_TOKEN = '00000000-0000-0000-0000-000000000001' // A01桌台的固定qr_token
+
+/**
+ * 开发模式：直接创建会话（不需要二维码）
+ */
+async function createDevSession(openId: string) {
+  try {
+    loadingText.value = `正在创建会话（开发模式 - ${DEV_TABLE_NO}号桌）...`
+    
+    const response = await post<{
+      sessionToken: string
+      sessionId: string
+      tableId: string
+      expiresAt: string
+    }>('/api/sessions', {
+      qrToken: DEV_QR_TOKEN, // 使用固定的qr_token
+      openId: openId
+    })
+
+    if (response.code === 0 && response.data) {
+      // 保存 Session Token 到本地存储
+      setSessionToken(response.data.sessionToken)
+      
+      // 保存会话信息到 Store（使用简化的table对象）
+      sessionStore.setSession(
+        response.data.sessionToken,
+        {
+          id: response.data.tableId,
+          tableNo: DEV_TABLE_NO, // 使用配置的桌号
+          area: undefined,
+          seatCount: undefined
+        },
+        openId
+      )
+
+      // 显示提示
+      Taro.showToast({
+        title: `开发模式：${DEV_TABLE_NO}号桌`,
+        icon: 'success',
+        duration: 1500
+      })
+
+      // 延迟跳转，让用户看到提示
+      setTimeout(() => {
+        Taro.redirectTo({
+          url: '/pages/menu/index'
+        })
+      }, 1500)
+    } else {
+      // 错误处理
+      Taro.showToast({
+        title: response.message || '创建会话失败',
+        icon: 'none',
+        duration: 2000
+      })
+      loadingText.value = '创建会话失败，请重试'
+    }
+  } catch (error) {
+    console.error('开发模式创建会话失败:', error)
+    Taro.showToast({
+      title: '网络错误，请重试',
+      icon: 'none',
+      duration: 2000
+    })
+    loadingText.value = '网络错误，请重试'
+  }
+}
 
 /**
  * 创建会话
@@ -24,25 +96,33 @@ async function createSession(qrToken: string, openId: string) {
     
     const response = await post<{
       sessionToken: string
-      table: {
-        id: string
-        tableNo: string
-        area?: string
-        seatCount?: number
-      }
+      sessionId: string
+      tableId: string
+      expiresAt: string
     }>('/api/sessions', {
-      qr_token: qrToken,
-      open_id: openId
+      qrToken: qrToken,
+      openId: openId
     })
 
     if (response.code === 0 && response.data) {
       // 保存 Session Token 到本地存储
       setSessionToken(response.data.sessionToken)
       
-      // 保存会话信息到 Store
+      // 从qrToken中提取桌号（如果可能）
+      // 注意：这是临时方案，理想情况下后端应该返回完整的table信息
+      const tableNo = qrToken.includes('table_') 
+        ? qrToken.split('table_')[1].split('_')[0] 
+        : 'Unknown'
+      
+      // 保存会话信息到 Store（使用简化的table对象）
       sessionStore.setSession(
         response.data.sessionToken,
-        response.data.table,
+        {
+          id: response.data.tableId,
+          tableNo: tableNo,
+          area: undefined,
+          seatCount: undefined
+        },
         openId
       )
 
@@ -124,12 +204,26 @@ async function getWechatOpenId(): Promise<string> {
 /**
  * 页面加载
  */
-onLoad(async (options) => {
-  console.log('Scan page loaded with options:', options)
+useLoad(async () => {
+  console.log('Scan page loaded with options:', router.params)
 
   try {
     // 解析二维码参数
-    const qrToken = options?.qr_token || options?.scene
+    const qrToken = router.params?.qr_token || router.params?.scene
+
+    // 开发模式：如果没有二维码参数，使用默认桌号
+    if (!qrToken && DEV_MODE) {
+      console.log(`开发模式启用：使用默认 ${DEV_TABLE_NO} 号桌`)
+      loadingText.value = `开发模式：${DEV_TABLE_NO}号桌`
+      
+      // 获取 OpenID
+      loadingText.value = '正在获取用户信息...'
+      const openId = await getWechatOpenId()
+
+      // 创建开发会话
+      await createDevSession(openId)
+      return
+    }
 
     if (!qrToken) {
       Taro.showModal({

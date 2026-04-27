@@ -95,7 +95,7 @@ export function clearSessionToken(): void;
 
 #### 3.3 请求拦截器
 
-- 自动拼接 baseURL（开发环境: `http://localhost:7001`，生产环境: `https://api.example.com`）
+- 自动拼接 baseURL（开发环境: `http://localhost:7001`，生产环境: `http://localhost:7001`）
 - 自动注入 Session Token
 - 设置默认 Content-Type 为 `application/json`
 - 设置请求超时时间为 10 秒

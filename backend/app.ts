@@ -9,7 +9,7 @@ export default class AppBootHook {
 
   async willReady() {
     // Define model associations
-    const { Dish, Sku } = this.app.model;
+    const { Dish, Sku, Category } = this.app.model;
     
     // Dish has many SKUs
     Dish.hasMany(Sku, {
@@ -21,6 +21,18 @@ export default class AppBootHook {
     Sku.belongsTo(Dish, {
       foreignKey: 'dish_id',
       as: 'dish',
+    });
+
+    // Dish belongs to Category
+    Dish.belongsTo(Category, {
+      foreignKey: 'category_id',
+      as: 'category',
+    });
+
+    // Category has many Dishes
+    Category.hasMany(Dish, {
+      foreignKey: 'category_id',
+      as: 'dishes',
     });
 
     // Sync database models in development/test

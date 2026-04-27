@@ -6,7 +6,7 @@ import Taro from '@tarojs/taro'
 const BASE_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:7001/api'
-    : 'https://api.example.com/api'
+    : 'http://localhost:7001/api'
 
 /**
  * 统一 API 响应格式

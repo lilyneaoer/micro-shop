@@ -129,7 +129,7 @@ npm run lint:fix
 
 ```typescript
 // 开发环境: http://localhost:7001
-// 生产环境: https://api.example.com
+// 生产环境: http://localhost:7001
 ```
 
 ### 页面路由

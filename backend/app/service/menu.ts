@@ -201,6 +201,12 @@ export default class MenuService extends Service {
           as: 'skus',
           required: false,
         },
+        {
+          model: this.app.model.Category,
+          as: 'category',
+          attributes: ['id', 'name', 'sort_order'],
+          required: false,
+        },
       ],
       order: [
         ['sort_order', 'ASC'],

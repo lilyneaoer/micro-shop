@@ -8,6 +8,8 @@ import * as jwt from 'jsonwebtoken';
  */
 export default (_options: unknown, app: Application) => {
   return async (ctx: Context, next: () => Promise<void>) => {
+    let authenticated = false;
+
     // Try JWT authentication first
     const authHeader = ctx.request.headers.authorization as string | undefined;
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -17,44 +19,44 @@ export default (_options: unknown, app: Application) => {
         const decoded = jwt.verify(token, secret) as { merchantId: string; username: string };
         ctx.state.merchantId = decoded.merchantId;
         ctx.state.username = decoded.username;
-        await next();
-        return;
+        authenticated = true;
       } catch (error) {
         // JWT verification failed, continue to try session auth
       }
     }
 
-    // Try Session Token authentication
-    const sessionToken =
-      (ctx.request.headers['x-session-token'] as string) ||
-      (ctx.query.session_token as string);
+    // Try Session Token authentication if JWT failed
+    if (!authenticated) {
+      const sessionToken =
+        (ctx.request.headers['x-session-token'] as string) ||
+        (ctx.query.session_token as string);
 
-    if (sessionToken) {
-      try {
-        const result = await ctx.service.session.validateSessionToken(sessionToken);
-        if (result.valid) {
-          ctx.state.sessionId = result.sessionId;
-          ctx.state.tableId = result.tableId;
-          
-          // Get merchantId from table
-          const table = await app.model.Table.findOne({
-            where: { id: result.tableId },
-            attributes: ['merchant_id'],
-          });
-          
-          if (table) {
-            ctx.state.merchantId = table.get('merchant_id') as string;
+      if (sessionToken) {
+        try {
+          const result = await ctx.service.session.validateSessionToken(sessionToken);
+          if (result.valid) {
+            ctx.state.sessionId = result.sessionId;
+            ctx.state.tableId = result.tableId;
+            
+            // Get merchantId from table
+            const table = await app.model.Table.findOne({
+              where: { id: result.tableId },
+              attributes: ['merchant_id'],
+            });
+            
+            if (table) {
+              ctx.state.merchantId = table.get('merchant_id') as string;
+            }
+            
+            authenticated = true;
           }
-          
-          await next();
-          return;
+        } catch (error) {
+          // Session validation failed, continue without auth
         }
-      } catch (error) {
-        // Session validation failed, continue without auth
       }
     }
 
-    // No valid authentication found, continue without setting state
+    // Continue to next middleware (only called once)
     await next();
   };
 };

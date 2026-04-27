@@ -86,7 +86,7 @@ npm run lint:fix
 API 基础地址在 `src/api/index.ts` 中配置：
 
 - 开发环境: `http://localhost:7001/api`
-- 生产环境: `https://api.example.com/api`
+- 生产环境: `http://localhost:7001/api`
 
 ## 认证流程
 
