@@ -315,8 +315,9 @@ export default class OrderService extends Service {
 
     return {
       ...order.toJSON(),
+      table_no: table?.table_no || null,
+      area: table?.area || null,
       items: orderItems.map((item) => item.toJSON()),
-      table: table ? { table_no: table.table_no, area: table.area } : null,
     };
   }
 
@@ -355,6 +356,9 @@ export default class OrderService extends Service {
       }
     }
 
+    // Get total count
+    const total = await this.app.model.Order.count({ where });
+
     const orders: any[] = await this.app.model.Order.findAll({
       where,
       order: [['created_at', 'DESC']],
@@ -374,13 +378,19 @@ export default class OrderService extends Service {
 
     const tableMap = new Map(tables.map((table) => [table.id, table]));
 
-    return orders.map((order) => {
+    const list = orders.map((order) => {
       const table = tableMap.get(order.table_id);
       return {
         ...order.toJSON(),
-        table: table ? { table_no: table.table_no, area: table.area } : null,
+        table_no: table?.table_no || null,
+        area: table?.area || null,
       };
     });
+
+    return {
+      list,
+      total,
+    };
   }
 
   /**

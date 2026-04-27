@@ -310,6 +310,7 @@ export interface Order {
   orderNo: string
   tableId: string
   tableNo: string
+  area: string
   totalAmount: number // 单位：分
   status: OrderStatus
   customerRemark: string
