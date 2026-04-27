@@ -1,6 +1,6 @@
 <template>
-  <view class="scan-page">
-    <view class="loading">
+  <view :class="$style.scanPage">
+    <view :class="$style.loading">
       <text>{{ loadingText }}</text>
     </view>
   </view>
@@ -254,8 +254,8 @@ useLoad(async () => {
 })
 </script>
 
-<style lang="less" scoped>
-.scan-page {
+<style lang="less" module>
+.scanPage {
   display: flex;
   align-items: center;
   justify-content: center;

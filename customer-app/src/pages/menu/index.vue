@@ -1,10 +1,10 @@
 <template>
-  <view class="menu-page">
+  <view :class="$style.menuPage">
     <!-- 搜索栏 -->
-    <view class="search-bar">
+    <view :class="$style.searchBar">
       <input
         v-model="searchKeyword"
-        class="search-input"
+        :class="$style.searchInput"
         type="text"
         placeholder="搜索菜品"
         @input="handleSearch"
@@ -14,15 +14,14 @@
     <!-- 分类标签 -->
     <scroll-view
       v-if="!searchKeyword"
-      class="category-tabs"
+      :class="$style.categoryTabs"
       scroll-x
       scroll-with-animation
     >
       <view
         v-for="category in categories"
         :key="category.id"
-        class="category-tab"
-        :class="{ active: currentCategoryId === category.id }"
+        :class="[$style.categoryTab, { [$style.active]: currentCategoryId === category.id }]"
         @tap="selectCategory(category.id)"
       >
         {{ category.name }}
@@ -30,9 +29,9 @@
     </scroll-view>
 
     <!-- 菜品列表 -->
-    <scroll-view class="dish-list" scroll-y>
-      <view v-if="loading" class="loading">加载中...</view>
-      <view v-else-if="displayDishes.length === 0" class="empty">
+    <scroll-view :class="$style.dishList" scroll-y>
+      <view v-if="loading" :class="$style.loading">加载中...</view>
+      <view v-else-if="displayDishes.length === 0" :class="$style.empty">
         {{ searchKeyword ? '未找到相关菜品' : '暂无菜品' }}
       </view>
       <view v-else>
@@ -40,40 +39,40 @@
         <view
           v-for="group in groupedDishes"
           :key="group.categoryId"
-          class="category-group"
+          :class="$style.categoryGroup"
         >
-          <view class="category-title">{{ group.categoryName }}</view>
-          <view class="dishes">
+          <view :class="$style.categoryTitle">{{ group.categoryName }}</view>
+          <view :class="$style.dishes">
             <view
               v-for="dish in group.dishes"
               :key="dish.id"
-              class="dish-item"
+              :class="$style.dishItem"
             >
               <image
                 v-if="dish.imageUrl"
                 :src="dish.imageUrl"
-                class="dish-image"
+                :class="$style.dishImage"
                 mode="aspectFill"
               />
-              <view class="dish-info">
-                <view class="dish-name">{{ dish.name }}</view>
-                <view class="dish-description">{{ dish.description }}</view>
-                <view class="dish-footer">
-                  <view class="dish-price">¥{{ formatPrice(dish.price) }}</view>
-                  <view class="dish-actions">
+              <view :class="$style.dishInfo">
+                <view :class="$style.dishName">{{ dish.name }}</view>
+                <view :class="$style.dishDescription">{{ dish.description }}</view>
+                <view :class="$style.dishFooter">
+                  <view :class="$style.dishPrice">¥{{ formatPrice(dish.price) }}</view>
+                  <view :class="$style.dishActions">
                     <view
                       v-if="getCartQuantity(dish.id) > 0"
-                      class="quantity-control"
+                      :class="$style.quantityControl"
                     >
                       <view
-                        class="btn-minus"
+                        :class="$style.btnMinus"
                         @tap="decreaseQuantity(dish.id)"
                       >
                         -
                       </view>
-                      <view class="quantity">{{ getCartQuantity(dish.id) }}</view>
+                      <view :class="$style.quantity">{{ getCartQuantity(dish.id) }}</view>
                       <view
-                        class="btn-plus"
+                        :class="$style.btnPlus"
                         @tap="increaseQuantity(dish)"
                       >
                         +
@@ -81,7 +80,7 @@
                     </view>
                     <view
                       v-else
-                      class="btn-add"
+                      :class="$style.btnAdd"
                       @tap="addToCart(dish)"
                     >
                       加入购物车
@@ -96,17 +95,17 @@
     </scroll-view>
 
     <!-- 购物车悬浮栏 -->
-    <view v-if="cartStore.totalQuantity > 0" class="cart-bar" @tap="goToCart">
-      <view class="cart-info">
-        <view class="cart-icon">
+    <view v-if="cartStore.totalQuantity > 0" :class="$style.cartBar" @tap="goToCart">
+      <view :class="$style.cartInfo">
+        <view :class="$style.cartIcon">
           🛒
-          <view class="cart-badge">{{ cartStore.totalQuantity }}</view>
+          <view :class="$style.cartBadge">{{ cartStore.totalQuantity }}</view>
         </view>
-        <view class="cart-total">
+        <view :class="$style.cartTotal">
           ¥{{ formatPrice(cartStore.totalAmount) }}
         </view>
       </view>
-      <view class="btn-checkout">去结算</view>
+      <view :class="$style.btnCheckout">去结算</view>
     </view>
   </view>
 </template>
@@ -359,21 +358,21 @@ onMounted(() => {
 })
 </script>
 
-<style lang="less" scoped>
-.menu-page {
+<style lang="less" module>
+.menuPage {
   display: flex;
   flex-direction: column;
   height: 100vh;
   background-color: #f5f5f5;
 }
 
-.search-bar {
+.searchBar {
   padding: 20rpx 32rpx;
   background-color: #fff;
   border-bottom: 1px solid #eee;
 }
 
-.search-input {
+.searchInput {
   width: 100%;
   height: 64rpx;
   padding: 0 24rpx;
@@ -382,7 +381,7 @@ onMounted(() => {
   font-size: 28rpx;
 }
 
-.category-tabs {
+.categoryTabs {
   display: flex;
   white-space: nowrap;
   padding: 20rpx 32rpx;
@@ -390,7 +389,7 @@ onMounted(() => {
   border-bottom: 1px solid #eee;
 }
 
-.category-tab {
+.categoryTab {
   display: inline-block;
   padding: 12rpx 32rpx;
   margin-right: 24rpx;
@@ -405,7 +404,7 @@ onMounted(() => {
   }
 }
 
-.dish-list {
+.dishList {
   flex: 1;
   padding: 0 0 120rpx 0;
 }
@@ -418,11 +417,11 @@ onMounted(() => {
   color: #999;
 }
 
-.category-group {
+.categoryGroup {
   margin-bottom: 32rpx;
 }
 
-.category-title {
+.categoryTitle {
   padding: 24rpx 32rpx 16rpx;
   font-size: 32rpx;
   font-weight: bold;
@@ -433,7 +432,7 @@ onMounted(() => {
   background-color: #fff;
 }
 
-.dish-item {
+.dishItem {
   display: flex;
   padding: 24rpx 32rpx;
   border-bottom: 1px solid #f5f5f5;
@@ -443,7 +442,7 @@ onMounted(() => {
   }
 }
 
-.dish-image {
+.dishImage {
   width: 160rpx;
   height: 160rpx;
   margin-right: 24rpx;
@@ -451,21 +450,21 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.dish-info {
+.dishInfo {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.dish-name {
+.dishName {
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
   margin-bottom: 8rpx;
 }
 
-.dish-description {
+.dishDescription {
   font-size: 24rpx;
   color: #999;
   margin-bottom: 16rpx;
@@ -476,24 +475,24 @@ onMounted(() => {
   -webkit-box-orient: vertical;
 }
 
-.dish-footer {
+.dishFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.dish-price {
+.dishPrice {
   font-size: 32rpx;
   font-weight: bold;
   color: #ff6b35;
 }
 
-.dish-actions {
+.dishActions {
   display: flex;
   align-items: center;
 }
 
-.btn-add {
+.btnAdd {
   padding: 8rpx 24rpx;
   font-size: 24rpx;
   color: #fff;
@@ -501,14 +500,14 @@ onMounted(() => {
   border-radius: 32rpx;
 }
 
-.quantity-control {
+.quantityControl {
   display: flex;
   align-items: center;
   gap: 16rpx;
 }
 
-.btn-minus,
-.btn-plus {
+.btnMinus,
+.btnPlus {
   width: 48rpx;
   height: 48rpx;
   display: flex;
@@ -527,7 +526,7 @@ onMounted(() => {
   font-weight: bold;
 }
 
-.cart-bar {
+.cartBar {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -540,18 +539,18 @@ onMounted(() => {
   box-shadow: 0 -2rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
-.cart-info {
+.cartInfo {
   display: flex;
   align-items: center;
   gap: 24rpx;
 }
 
-.cart-icon {
+.cartIcon {
   position: relative;
   font-size: 48rpx;
 }
 
-.cart-badge {
+.cartBadge {
   position: absolute;
   top: -8rpx;
   right: -8rpx;
@@ -567,13 +566,13 @@ onMounted(() => {
   border-radius: 16rpx;
 }
 
-.cart-total {
+.cartTotal {
   font-size: 36rpx;
   font-weight: bold;
   color: #fff;
 }
 
-.btn-checkout {
+.btnCheckout {
   padding: 16rpx 48rpx;
   font-size: 28rpx;
   color: #333;
