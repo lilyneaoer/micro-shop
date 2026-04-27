@@ -15,12 +15,19 @@
           :key="`${item.dishId}-${item.skuId || ''}`"
           :class="$style.cartItem"
         >
-          <image
-            v-if="item.imageUrl"
-            :src="item.imageUrl"
-            :class="$style.itemImage"
-            mode="aspectFill"
-          />
+          <!-- 商品图片或占位图 -->
+          <view :class="$style.itemImageWrapper">
+            <image
+              v-if="item.imageUrl"
+              :src="item.imageUrl"
+              :class="$style.itemImage"
+              mode="aspectFill"
+            />
+            <view v-else :class="$style.itemPlaceholder">
+              <view :class="$style.placeholderIcon">🍽️</view>
+            </view>
+          </view>
+          
           <view :class="$style.itemInfo">
             <view :class="$style.itemName">{{ item.dishName }}</view>
             <view v-if="item.skuName" :class="$style.itemSku">{{ item.skuName }}</view>
@@ -243,12 +250,34 @@ function goToOrderConfirm() {
   border-bottom: 1px solid #f5f5f5;
 }
 
-.itemImage {
+.itemImageWrapper {
   width: 120rpx;
   height: 120rpx;
   margin-right: 24rpx;
-  border-radius: 8rpx;
   flex-shrink: 0;
+}
+
+.itemImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+  object-fit: cover;
+}
+
+.itemPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  border-radius: 8rpx;
+  border: 2rpx dashed #d0d0d0;
+}
+
+.placeholderIcon {
+  font-size: 48rpx;
+  opacity: 0.5;
 }
 
 .itemInfo {
