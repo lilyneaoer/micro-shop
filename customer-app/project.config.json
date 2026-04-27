@@ -4,7 +4,7 @@
   "description": "顾客小程序 - 扫码点餐系统",
   "appid": "wx648d5e4c375826a7",
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "es6": false,
     "enhance": true,
     "compileHotReLoad": false,

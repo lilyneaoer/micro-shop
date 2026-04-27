@@ -16,7 +16,8 @@ const router = useRouter()
 const sessionStore = useSessionStore()
 const loadingText = ref('正在加载...')
 
-// 开发模式配置
+// !!!!!!!!!!!
+// TODO 开发模式配置
 const DEV_MODE = true // 设置为 false 关闭开发模式
 const DEV_TABLE_NO = 'A01' // 开发模式默认桌号
 const DEV_QR_TOKEN = '00000000-0000-0000-0000-000000000001' // A01桌台的固定qr_token
