@@ -1,6 +1,7 @@
 import { Service } from 'egg';
 import { v4 as uuidv4 } from 'uuid';
 import { ErrorCode } from '../utils/response';
+import { modelToCamelCase } from '../utils/caseConverter';
 
 export interface CreateTableParams {
   table_no: string;
@@ -37,7 +38,7 @@ export default class TableService extends Service {
       where: { merchant_id: merchantId },
       order: [['created_at', 'ASC']],
     });
-    return tables.map((t) => this.toTableData(t));
+    return modelToCamelCase(tables.map((t) => this.toTableData(t)));
   }
 
   /**
@@ -55,7 +56,7 @@ export default class TableService extends Service {
     if (!table) {
       return { success: false, code: ErrorCode.NOT_FOUND, message: '桌台不存在' };
     }
-    return { success: true, data: this.toTableData(table) };
+    return { success: true, data: modelToCamelCase(this.toTableData(table)) };
   }
 
   /**
@@ -81,7 +82,7 @@ export default class TableService extends Service {
         qr_token,
         is_active: true,
       });
-      return { success: true, data: this.toTableData(table) };
+      return { success: true, data: modelToCamelCase(this.toTableData(table)) };
     } catch (err: unknown) {
       this.logger.error('[TableService] createTable error:', err);
       const error = err as { name?: string };
@@ -118,7 +119,7 @@ export default class TableService extends Service {
 
     try {
       await table.update(updateData);
-      return { success: true, data: this.toTableData(table) };
+      return { success: true, data: modelToCamelCase(this.toTableData(table)) };
     } catch (err: unknown) {
       this.logger.error('[TableService] updateTable error:', err);
       return { success: false, code: ErrorCode.INTERNAL_SERVER_ERROR, message: '服务器内部错误' };
@@ -167,7 +168,7 @@ export default class TableService extends Service {
     }
     const qr_token = table.get('qr_token') as string;
     const qr_url = `https://example.com/scan?token=${qr_token}`;
-    return { success: true, data: { qr_token, qr_url } };
+    return { success: true, data: modelToCamelCase({ qr_token, qr_url }) };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

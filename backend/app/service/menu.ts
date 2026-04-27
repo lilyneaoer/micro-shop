@@ -1,6 +1,7 @@
 import { Service } from 'egg';
 import { ErrorCode } from '../utils/response';
 import { Op } from 'sequelize';
+import { modelToCamelCase } from '../utils/caseConverter';
 
 export interface CreateCategoryInput {
   name: string;
@@ -56,7 +57,7 @@ export default class MenuService extends Service {
       sort_order: input.sort_order ?? 0,
     } as any);
 
-    return category;
+    return modelToCamelCase(category);
   }
 
   /**
@@ -72,7 +73,7 @@ export default class MenuService extends Service {
       ],
     });
 
-    return categories;
+    return modelToCamelCase(categories);
   }
 
   /**
@@ -108,7 +109,7 @@ export default class MenuService extends Service {
     }
 
     await category.save();
-    return category;
+    return modelToCamelCase(category);
   }
 
   /**
@@ -174,7 +175,7 @@ export default class MenuService extends Service {
       );
     }
 
-    return dish;
+    return modelToCamelCase(dish);
   }
 
   /**
@@ -207,7 +208,7 @@ export default class MenuService extends Service {
       ],
     });
 
-    return dishes;
+    return modelToCamelCase(dishes);
   }
 
   /**
@@ -297,7 +298,9 @@ export default class MenuService extends Service {
       }
     }
 
-    return dish;
+    // Re-fetch dish with SKUs to get updated data
+    const updatedDish = await this.getDishById(merchantId, dishId);
+    return updatedDish;
   }
 
   /**

@@ -484,7 +484,7 @@ export default class MenuController extends Controller {
       });
 
       ctx.status = 200;
-      ctx.body = formatResponse({ image_url: imageUrl }, '图片上传成功');
+      ctx.body = formatResponse({ imageUrl: imageUrl }, '图片上传成功');
     } catch (error) {
       ctx.logger.error('Image upload failed:', error);
       ctx.status = 500;

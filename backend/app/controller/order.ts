@@ -98,7 +98,7 @@ export default class OrderController extends Controller {
       if (result.code === ErrorCode.DISH_UNAVAILABLE) {
         ctx.status = 422;
         ctx.body = formatError(result.code, result.message, {
-          unavailable_dishes: result.unavailableDishes,
+          unavailableDishes: result.unavailableDishes,
         });
       } else if (result.code === ErrorCode.NOT_FOUND) {
         ctx.status = 404;
@@ -364,7 +364,7 @@ export default class OrderController extends Controller {
     ctx.status = 200;
     ctx.body = formatResponse(
       {
-        refund_id: result.refund_id,
+        refundId: result.refund_id,
       },
       '退款成功',
     );

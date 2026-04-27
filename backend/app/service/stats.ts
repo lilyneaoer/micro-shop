@@ -1,5 +1,6 @@
 import { Service } from 'egg';
 import { Op, QueryTypes } from 'sequelize';
+import { modelToCamelCase } from '../utils/caseConverter';
 
 export interface DashboardData {
   today_revenue: number;
@@ -77,12 +78,12 @@ export default class StatsService extends Service {
 
     const month_revenue = monthOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
-    return {
+    return modelToCamelCase({
       today_revenue,
       today_order_count,
       today_avg_order_value,
       month_revenue,
-    };
+    });
   }
 
   /**
@@ -223,7 +224,7 @@ export default class StatsService extends Service {
       iter.setDate(iter.getDate() + 1);
     }
 
-    return result;
+    return modelToCamelCase(result);
   }
 
   /**
@@ -275,12 +276,14 @@ export default class StatsService extends Service {
       },
     );
 
-    return rows.map((row) => ({
+    const result = rows.map((row) => ({
       dish_id: row.dish_id,
       dish_name: row.dish_name,
       quantity: parseInt(row.quantity, 10) || 0,
       revenue: parseInt(row.revenue, 10) || 0,
     }));
+
+    return modelToCamelCase(result);
   }
 
   /**

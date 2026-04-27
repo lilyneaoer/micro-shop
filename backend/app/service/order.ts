@@ -2,6 +2,7 @@ import { Service } from 'egg';
 import { ErrorCode } from '../utils/response';
 import { OrderStatus } from '../model/order';
 import { Op, Transaction } from 'sequelize';
+import { modelToCamelCase } from '../utils/caseConverter';
 
 export interface OrderItemInput {
   dish_id: string;
@@ -313,12 +314,14 @@ export default class OrderService extends Service {
       },
     });
 
-    return {
+    const orderData = {
       ...order.toJSON(),
       table_no: table?.table_no || null,
       area: table?.area || null,
       items: orderItems.map((item) => item.toJSON()),
     };
+
+    return modelToCamelCase(orderData);
   }
 
   /**
@@ -387,10 +390,10 @@ export default class OrderService extends Service {
       };
     });
 
-    return {
+    return modelToCamelCase({
       list,
       total,
-    };
+    });
   }
 
   /**
@@ -547,9 +550,11 @@ export default class OrderService extends Service {
       orderItemsMap.get(item.order_id)!.push(item.toJSON());
     });
 
-    return orders.map((order) => ({
+    const result = orders.map((order) => ({
       ...order.toJSON(),
       items: orderItemsMap.get(order.id) || [],
     }));
+
+    return modelToCamelCase(result);
   }
 }
