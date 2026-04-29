@@ -1,36 +1,36 @@
 <template>
-  <view class="order-success-page">
+  <view :class="$style.orderSuccessPage">
     <!-- 成功图标 -->
-    <view class="success-icon">✅</view>
+    <view :class="$style.successIcon">✅</view>
     
     <!-- 成功提示 -->
-    <view class="success-title">支付成功</view>
-    <view class="success-subtitle">您的订单已提交，请耐心等待</view>
+    <view :class="$style.successTitle">支付成功</view>
+    <view :class="$style.successSubtitle">您的订单已提交，请耐心等待</view>
 
     <!-- 订单信息 -->
-    <view v-if="order" class="order-info">
-      <view class="info-row">
-        <text class="info-label">订单编号</text>
-        <text class="info-value">{{ order.orderNo }}</text>
+    <view v-if="order" :class="$style.orderInfo">
+      <view :class="$style.infoRow">
+        <text :class="$style.infoLabel">订单编号</text>
+        <text :class="$style.infoValue">{{ order.orderNo }}</text>
       </view>
-      <view class="info-row">
-        <text class="info-label">桌号</text>
-        <text class="info-value">{{ order.tableNo }}</text>
+      <view :class="$style.infoRow">
+        <text :class="$style.infoLabel">桌号</text>
+        <text :class="$style.infoValue">{{ order.tableNo }}</text>
       </view>
-      <view class="info-row">
-        <text class="info-label">支付金额</text>
-        <text class="info-value amount">¥{{ formatPrice(order.totalAmount) }}</text>
+      <view :class="$style.infoRow">
+        <text :class="$style.infoLabel">支付金额</text>
+        <text :class="[$style.infoValue, $style.amount]">¥{{ formatPrice(order.totalAmount) }}</text>
       </view>
-      <view class="info-row">
-        <text class="info-label">预计等待时间</text>
-        <text class="info-value">{{ estimatedWaitTime }}</text>
+      <view :class="$style.infoRow">
+        <text :class="$style.infoLabel">预计等待时间</text>
+        <text :class="$style.infoValue">{{ estimatedWaitTime }}</text>
       </view>
     </view>
 
     <!-- 操作按钮 -->
-    <view class="action-buttons">
-      <view class="btn-secondary" @tap="goToOrderList">查看订单</view>
-      <view class="btn-primary" @tap="goToMenu">继续点餐</view>
+    <view :class="$style.actionButtons">
+      <view :class="$style.btnSecondary" @tap="goToOrderList">查看订单</view>
+      <view :class="$style.btnPrimary" @tap="goToMenu">继续点餐</view>
     </view>
   </view>
 </template>
@@ -121,8 +121,8 @@ onMounted(() => {
 })
 </script>
 
-<style lang="less" scoped>
-.order-success-page {
+<style lang="less" module>
+.orderSuccessPage {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -131,25 +131,25 @@ onMounted(() => {
   background-color: #f5f5f5;
 }
 
-.success-icon {
+.successIcon {
   font-size: 160rpx;
   margin-bottom: 32rpx;
 }
 
-.success-title {
+.successTitle {
   font-size: 48rpx;
   font-weight: bold;
   color: #333;
   margin-bottom: 16rpx;
 }
 
-.success-subtitle {
+.successSubtitle {
   font-size: 28rpx;
   color: #999;
   margin-bottom: 64rpx;
 }
 
-.order-info {
+.orderInfo {
   width: 100%;
   padding: 32rpx;
   background-color: #fff;
@@ -157,7 +157,7 @@ onMounted(() => {
   margin-bottom: 48rpx;
 }
 
-.info-row {
+.infoRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -169,12 +169,12 @@ onMounted(() => {
   }
 }
 
-.info-label {
+.infoLabel {
   font-size: 28rpx;
   color: #666;
 }
 
-.info-value {
+.infoValue {
   font-size: 28rpx;
   color: #333;
   font-weight: 500;
@@ -186,14 +186,14 @@ onMounted(() => {
   }
 }
 
-.action-buttons {
+.actionButtons {
   width: 100%;
   display: flex;
   gap: 24rpx;
 }
 
-.btn-secondary,
-.btn-primary {
+.btnSecondary,
+.btnPrimary {
   flex: 1;
   padding: 24rpx 0;
   text-align: center;
@@ -202,13 +202,13 @@ onMounted(() => {
   border-radius: 48rpx;
 }
 
-.btn-secondary {
+.btnSecondary {
   color: #ff6b35;
   background-color: #fff;
   border: 2px solid #ff6b35;
 }
 
-.btn-primary {
+.btnPrimary {
   color: #fff;
   background-color: #ff6b35;
 }

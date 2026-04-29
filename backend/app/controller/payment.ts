@@ -80,8 +80,8 @@ export default class PaymentController extends Controller {
     ctx.status = 200;
     ctx.body = formatResponse(
       {
-        prepay_id: result.prepay_id,
-        payment_params: result.payment_params,
+        prepayId: result.prepay_id,
+        paymentParams: result.payment_params,
       },
       '预支付订单创建成功',
     );

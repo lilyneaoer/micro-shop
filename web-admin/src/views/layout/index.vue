@@ -14,6 +14,10 @@
           <el-icon><DataLine /></el-icon>
           <span>数据看板</span>
         </el-menu-item>
+        <el-menu-item index="/orders">
+          <el-icon><List /></el-icon>
+          <span>订单管理</span>
+        </el-menu-item>
         <el-menu-item index="/tables">
           <el-icon><Grid /></el-icon>
           <span>桌台管理</span>
@@ -21,14 +25,6 @@
         <el-menu-item index="/menu">
           <el-icon><Food /></el-icon>
           <span>菜单管理</span>
-        </el-menu-item>
-        <el-menu-item index="/orders">
-          <el-icon><List /></el-icon>
-          <span>订单管理</span>
-        </el-menu-item>
-        <el-menu-item index="/stats">
-          <el-icon><TrendCharts /></el-icon>
-          <span>数据报表</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -38,7 +34,7 @@
       <!-- 顶部导航 -->
       <el-header class="layout-header">
         <span class="page-title">{{ currentTitle }}</span>
-        <el-button type="text" @click="handleLogout">退出登录</el-button>
+        <el-button link @click="handleLogout">退出登录</el-button>
       </el-header>
 
       <!-- 内容区 -->
@@ -53,6 +49,7 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
+import { DataLine, Grid, Food, List } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()

@@ -34,10 +34,14 @@ export default class MenuController extends Controller {
     const { ctx } = this;
     const merchantId = ctx.state.merchantId;
 
-    const { name, sort_order } = ctx.request.body as {
+    const { name, sort_order, sortOrder } = ctx.request.body as {
       name?: string;
       sort_order?: number;
+      sortOrder?: number;
     };
+
+    // Support both snake_case and camelCase for sort_order
+    const sortOrderValue = sort_order ?? sortOrder;
 
     // Validation
     if (!name || typeof name !== 'string' || name.trim() === '') {
@@ -46,7 +50,7 @@ export default class MenuController extends Controller {
       return;
     }
 
-    if (sort_order !== undefined && (typeof sort_order !== 'number' || sort_order < 0)) {
+    if (sortOrderValue !== undefined && (typeof sortOrderValue !== 'number' || sortOrderValue < 0)) {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '排序值必须为非负整数');
       return;
@@ -54,7 +58,7 @@ export default class MenuController extends Controller {
 
     const category = await ctx.service.menu.createCategory(merchantId, {
       name: name.trim(),
-      sort_order,
+      sort_order: sortOrderValue,
     });
 
     ctx.status = 201;
@@ -71,10 +75,14 @@ export default class MenuController extends Controller {
     const merchantId = ctx.state.merchantId;
     const categoryId = ctx.params.id;
 
-    const { name, sort_order } = ctx.request.body as {
+    const { name, sort_order, sortOrder } = ctx.request.body as {
       name?: string;
       sort_order?: number;
+      sortOrder?: number;
     };
+
+    // Support both snake_case and camelCase for sort_order
+    const sortOrderValue = sort_order ?? sortOrder;
 
     // Validation
     if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
@@ -83,7 +91,7 @@ export default class MenuController extends Controller {
       return;
     }
 
-    if (sort_order !== undefined && (typeof sort_order !== 'number' || sort_order < 0)) {
+    if (sortOrderValue !== undefined && (typeof sortOrderValue !== 'number' || sortOrderValue < 0)) {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '排序值必须为非负整数');
       return;
@@ -91,7 +99,7 @@ export default class MenuController extends Controller {
 
     const category = await ctx.service.menu.updateCategory(merchantId, categoryId, {
       name: name?.trim(),
-      sort_order,
+      sort_order: sortOrderValue,
     });
 
     if (!category) {
@@ -146,10 +154,12 @@ export default class MenuController extends Controller {
     }
 
     const merchantId = ctx.state.merchantId;
-    const { category_id } = ctx.query as { category_id?: string };
+    // 支持 camelCase 和 snake_case 两种参数格式
+    const { category_id, categoryId } = ctx.query as { category_id?: string; categoryId?: string };
+    const finalCategoryId = categoryId || category_id;
 
     const dishes = await ctx.service.menu.getDishes(merchantId, {
-      categoryId: category_id,
+      categoryId: finalCategoryId,
       availableOnly: isCustomerRequest, // Only return available dishes for customers
     });
 
@@ -166,20 +176,54 @@ export default class MenuController extends Controller {
     const { ctx } = this;
     const merchantId = ctx.state.merchantId;
 
-    const { category_id, name, description, price, image_url, is_available, has_sku, sort_order } =
-      ctx.request.body as {
-        category_id?: string;
-        name?: string;
-        description?: string;
-        price?: number;
-        image_url?: string;
+    // 支持 camelCase 和 snake_case 两种参数格式
+    const {
+      category_id,
+      categoryId,
+      name,
+      description,
+      price,
+      image_url,
+      imageUrl,
+      is_available,
+      isAvailable,
+      has_sku,
+      hasSku,
+      sort_order,
+      sortOrder,
+      skus,
+    } = ctx.request.body as {
+      category_id?: string;
+      categoryId?: string;
+      name?: string;
+      description?: string;
+      price?: number;
+      image_url?: string;
+      imageUrl?: string;
+      is_available?: boolean;
+      isAvailable?: boolean;
+      has_sku?: boolean;
+      hasSku?: boolean;
+      sort_order?: number;
+      sortOrder?: number;
+      skus?: Array<{
+        name: string;
+        priceDelta?: number;
+        price_delta?: number;
+        isAvailable?: boolean;
         is_available?: boolean;
-        has_sku?: boolean;
-        sort_order?: number;
-      };
+      }>;
+    };
+
+    // 优先使用 camelCase，fallback 到 snake_case
+    const finalCategoryId = categoryId || category_id;
+    const finalImageUrl = imageUrl || image_url;
+    const finalIsAvailable = isAvailable !== undefined ? isAvailable : is_available;
+    const finalHasSku = hasSku !== undefined ? hasSku : has_sku;
+    const finalSortOrder = sortOrder !== undefined ? sortOrder : sort_order;
 
     // Validation
-    if (!category_id || typeof category_id !== 'string') {
+    if (!finalCategoryId || typeof finalCategoryId !== 'string') {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '分类ID不能为空');
       return;
@@ -197,21 +241,29 @@ export default class MenuController extends Controller {
       return;
     }
 
-    if (sort_order !== undefined && (typeof sort_order !== 'number' || sort_order < 0)) {
+    if (finalSortOrder !== undefined && (typeof finalSortOrder !== 'number' || finalSortOrder < 0)) {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '排序值必须为非负整数');
       return;
     }
 
+    // 转换 SKU 数据格式（camelCase -> snake_case）
+    const finalSkus = skus?.map(sku => ({
+      name: sku.name,
+      price_delta: sku.priceDelta ?? sku.price_delta ?? 0,
+      is_available: sku.isAvailable ?? sku.is_available ?? true,
+    }));
+
     const dish = await ctx.service.menu.createDish(merchantId, {
-      category_id,
+      category_id: finalCategoryId,
       name: name.trim(),
       description,
       price,
-      image_url,
-      is_available,
-      has_sku,
-      sort_order,
+      image_url: finalImageUrl,
+      is_available: finalIsAvailable,
+      has_sku: finalHasSku,
+      sort_order: finalSortOrder,
+      skus: finalSkus,
     });
 
     if (!dish) {
@@ -234,17 +286,51 @@ export default class MenuController extends Controller {
     const merchantId = ctx.state.merchantId;
     const dishId = ctx.params.id;
 
-    const { category_id, name, description, price, image_url, is_available, has_sku, sort_order } =
-      ctx.request.body as {
-        category_id?: string;
-        name?: string;
-        description?: string;
-        price?: number;
-        image_url?: string;
+    // 支持 camelCase 和 snake_case 两种参数格式
+    const {
+      category_id,
+      categoryId,
+      name,
+      description,
+      price,
+      image_url,
+      imageUrl,
+      is_available,
+      isAvailable,
+      has_sku,
+      hasSku,
+      sort_order,
+      sortOrder,
+      skus,
+    } = ctx.request.body as {
+      category_id?: string;
+      categoryId?: string;
+      name?: string;
+      description?: string;
+      price?: number;
+      image_url?: string;
+      imageUrl?: string;
+      is_available?: boolean;
+      isAvailable?: boolean;
+      has_sku?: boolean;
+      hasSku?: boolean;
+      sort_order?: number;
+      sortOrder?: number;
+      skus?: Array<{
+        name: string;
+        priceDelta?: number;
+        price_delta?: number;
+        isAvailable?: boolean;
         is_available?: boolean;
-        has_sku?: boolean;
-        sort_order?: number;
-      };
+      }>;
+    };
+
+    // 优先使用 camelCase，fallback 到 snake_case
+    const finalCategoryId = categoryId || category_id;
+    const finalImageUrl = imageUrl || image_url;
+    const finalIsAvailable = isAvailable !== undefined ? isAvailable : is_available;
+    const finalHasSku = hasSku !== undefined ? hasSku : has_sku;
+    const finalSortOrder = sortOrder !== undefined ? sortOrder : sort_order;
 
     // Validation
     if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
@@ -259,21 +345,29 @@ export default class MenuController extends Controller {
       return;
     }
 
-    if (sort_order !== undefined && (typeof sort_order !== 'number' || sort_order < 0)) {
+    if (finalSortOrder !== undefined && (typeof finalSortOrder !== 'number' || finalSortOrder < 0)) {
       ctx.status = 400;
       ctx.body = formatError(ErrorCode.VALIDATION_ERROR, '排序值必须为非负整数');
       return;
     }
 
+    // 转换 SKU 数据格式（camelCase -> snake_case）
+    const finalSkus = skus?.map(sku => ({
+      name: sku.name,
+      price_delta: sku.priceDelta ?? sku.price_delta ?? 0,
+      is_available: sku.isAvailable ?? sku.is_available ?? true,
+    }));
+
     const dish = await ctx.service.menu.updateDish(merchantId, dishId, {
-      category_id,
+      category_id: finalCategoryId,
       name: name?.trim(),
       description,
       price,
-      image_url,
-      is_available,
-      has_sku,
-      sort_order,
+      image_url: finalImageUrl,
+      is_available: finalIsAvailable,
+      has_sku: finalHasSku,
+      sort_order: finalSortOrder,
+      skus: finalSkus,
     });
 
     if (!dish) {
@@ -382,7 +476,7 @@ export default class MenuController extends Controller {
       fs.writeFileSync(filepath, compressedBuffer);
 
       // Generate URL (in production, this would be the object storage URL)
-      const imageUrl = `/uploads/dishes/${filename}`;
+      const imageUrl = `/public/uploads/dishes/${filename}`;
 
       // Update dish with new image URL
       await ctx.service.menu.updateDish(merchantId, dishId, {
@@ -390,7 +484,7 @@ export default class MenuController extends Controller {
       });
 
       ctx.status = 200;
-      ctx.body = formatResponse({ image_url: imageUrl }, '图片上传成功');
+      ctx.body = formatResponse({ imageUrl: imageUrl }, '图片上传成功');
     } catch (error) {
       ctx.logger.error('Image upload failed:', error);
       ctx.status = 500;

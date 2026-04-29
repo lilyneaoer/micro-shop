@@ -16,7 +16,7 @@ const API_CONFIG = {
   // 开发环境使用本地后端
   baseURL: process.env.NODE_ENV === 'development' 
     ? 'http://localhost:7001' 
-    : 'https://api.example.com',
+    : 'http://localhost:7001',
   timeout: 10000
 }
 
@@ -64,10 +64,10 @@ Taro.addInterceptor((chain) => {
   // 如果是完整 URL，直接使用；否则拼接 baseURL
   const fullUrl = url.startsWith('http') ? url : `${API_CONFIG.baseURL}${url}`
 
-  // 注入 Session Token
+  // 注入 Session Token（使用 X-Session-Token header，符合后端 optionalAuth 中间件的要求）
   const sessionToken = getSessionToken()
   if (sessionToken) {
-    header['Authorization'] = `Bearer ${sessionToken}`
+    header['X-Session-Token'] = sessionToken
   }
 
   // 设置默认 Content-Type

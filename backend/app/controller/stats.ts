@@ -24,17 +24,23 @@ export default class StatsController extends Controller {
   /**
    * GET /api/stats/revenue
    * Get daily revenue trend for a date range (max 90 days)
-   * Query params: start_date (YYYY-MM-DD), end_date (YYYY-MM-DD)
+   * Query params: start_date (YYYY-MM-DD), end_date (YYYY-MM-DD) or startDate, endDate
    * Requirement 8.2, 8.6
    */
   async revenue() {
     const { ctx } = this;
     const merchantId = ctx.state.merchantId;
 
-    const { start_date, end_date } = ctx.query as {
+    const query = ctx.query as {
       start_date?: string;
       end_date?: string;
+      startDate?: string;
+      endDate?: string;
     };
+
+    // Support both snake_case and camelCase
+    const start_date = query.start_date || query.startDate;
+    const end_date = query.end_date || query.endDate;
 
     // Validate required params
     if (!start_date || !end_date) {
@@ -83,17 +89,23 @@ export default class StatsController extends Controller {
   /**
    * GET /api/stats/dishes
    * Get top 10 dishes by sales volume in a date range
-   * Query params: start_date (YYYY-MM-DD), end_date (YYYY-MM-DD)
+   * Query params: start_date (YYYY-MM-DD), end_date (YYYY-MM-DD) or startDate, endDate
    * Requirement 8.3
    */
   async dishes() {
     const { ctx } = this;
     const merchantId = ctx.state.merchantId;
 
-    const { start_date, end_date } = ctx.query as {
+    const query = ctx.query as {
       start_date?: string;
       end_date?: string;
+      startDate?: string;
+      endDate?: string;
     };
+
+    // Support both snake_case and camelCase
+    const start_date = query.start_date || query.startDate;
+    const end_date = query.end_date || query.endDate;
 
     // Validate required params
     if (!start_date || !end_date) {

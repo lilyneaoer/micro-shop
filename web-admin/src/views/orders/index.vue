@@ -56,6 +56,7 @@
       >
         <el-table-column prop="orderNo" label="订单号" min-width="180" />
         <el-table-column prop="tableNo" label="桌号" width="80" />
+        <el-table-column prop="area" label="区域" width="100" />
         <el-table-column label="金额" width="100">
           <template #default="{ row }">
             ¥{{ formatAmount(row.totalAmount) }}
@@ -88,133 +89,28 @@
           :total="ordersStore.total"
           :page-sizes="[10, 20, 50]"
           layout="total, sizes, prev, pager, next"
-          @size-change="handleSearch"
-          @current-change="handleSearch"
+          @update:current-page="handleSearch"
+          @update:page-size="handleSearch"
         />
       </div>
     </el-card>
 
-    <!-- 订单详情弹窗 -->
-    <el-dialog
+    <!-- 订单详情组件 -->
+    <OrderDetail
       v-model="detailVisible"
-      title="订单详情"
-      width="700px"
-      :close-on-click-modal="false"
-      @closed="currentOrder = null"
-    >
-      <template v-if="currentOrder">
-        <!-- 基本信息 -->
-        <el-descriptions :column="2" border size="small" class="detail-desc">
-          <el-descriptions-item label="订单号">{{ currentOrder.orderNo }}</el-descriptions-item>
-          <el-descriptions-item label="桌号">{{ currentOrder.tableNo }}</el-descriptions-item>
-          <el-descriptions-item label="状态">
-            <el-tag :type="statusTagType(currentOrder.status)" size="small">
-              {{ statusLabel(currentOrder.status) }}
-            </el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item label="下单时间">
-            {{ formatDateTime(currentOrder.createdAt) }}
-          </el-descriptions-item>
-          <el-descriptions-item label="支付时间">
-            {{ currentOrder.paidAt ? formatDateTime(currentOrder.paidAt) : '—' }}
-          </el-descriptions-item>
-          <el-descriptions-item label="实付金额">
-            ¥{{ formatAmount(currentOrder.totalAmount) }}
-          </el-descriptions-item>
-          <el-descriptions-item label="顾客备注" :span="2">
-            {{ currentOrder.customerRemark || '无' }}
-          </el-descriptions-item>
-        </el-descriptions>
-
-        <!-- 菜品列表 -->
-        <div class="section-title">菜品明细</div>
-        <el-table :data="currentOrder.items" size="small" border>
-          <el-table-column prop="dishName" label="菜品名称" min-width="120" />
-          <el-table-column label="规格" width="100">
-            <template #default="{ row }">
-              {{ row.skuName || '—' }}
-            </template>
-          </el-table-column>
-          <el-table-column label="单价" width="90">
-            <template #default="{ row }">
-              ¥{{ formatAmount(row.unitPrice) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="quantity" label="数量" width="70" />
-          <el-table-column label="小计" width="90">
-            <template #default="{ row }">
-              ¥{{ formatAmount(row.subtotal) }}
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <!-- 状态操作按钮 -->
-        <div class="action-row">
-          <el-button
-            v-if="currentOrder.status === 'paid'"
-            type="primary"
-            :loading="statusLoading"
-            @click="handleUpdateStatus('accepted')"
-          >
-            接单
-          </el-button>
-          <el-button
-            v-if="currentOrder.status === 'accepted'"
-            type="success"
-            :loading="statusLoading"
-            @click="handleUpdateStatus('completed')"
-          >
-            完成订单
-          </el-button>
-          <el-button
-            v-if="currentOrder.status === 'completed'"
-            type="warning"
-            @click="openRefund"
-          >
-            退款
-          </el-button>
-        </div>
-      </template>
-    </el-dialog>
-
-    <!-- 退款弹窗 -->
-    <el-dialog
-      v-model="refundVisible"
-      title="发起退款"
-      width="400px"
-      :close-on-click-modal="false"
-    >
-      <el-form :model="refundForm" :rules="refundRules" ref="refundFormRef" label-width="90px">
-        <el-form-item label="实付金额">
-          <span>¥{{ formatAmount(currentOrder?.totalAmount) }}</span>
-        </el-form-item>
-        <el-form-item label="退款金额" prop="amount">
-          <el-input
-            v-model="refundForm.amount"
-            type="number"
-            placeholder="请输入退款金额（元）"
-            :min="0.01"
-            :max="maxRefundYuan"
-          >
-            <template #prefix>¥</template>
-          </el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="refundVisible = false">取消</el-button>
-        <el-button type="primary" :loading="refundLoading" @click="handleRefund">
-          确认退款
-        </el-button>
-      </template>
-    </el-dialog>
+      :order="currentOrder"
+      :loading="detailLoading"
+      @update:order="handleOrderUpdate"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ref, reactive, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useOrdersStore } from '@/stores/orders'
 import type { Order, OrderStatus } from '@/api'
+import OrderDetail from './OrderDetail.vue'
 
 const ordersStore = useOrdersStore()
 
@@ -271,84 +167,29 @@ function handleReset() {
 
 const detailVisible = ref(false)
 const currentOrder = ref<Order | null>(null)
-const statusLoading = ref(false)
+const detailLoading = ref(false)
 
-function openDetail(order: Order) {
-  currentOrder.value = order
+async function openDetail(order: Order) {
   detailVisible.value = true
-}
-
-async function handleUpdateStatus(status: OrderStatus) {
-  if (!currentOrder.value) return
-  statusLoading.value = true
+  detailLoading.value = true
+  currentOrder.value = null
+  
   try {
-    const updated = await ordersStore.updateOrderStatus(currentOrder.value.id, status)
-    currentOrder.value = updated
-    ElMessage.success('订单状态已更新')
+    // 获取完整的订单详情（包含 items）
+    const { orderApi } = await import('@/api')
+    const fullOrder = await orderApi.detail(order.id)
+    currentOrder.value = fullOrder
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : '状态更新失败'
+    const msg = err instanceof Error ? err.message : '获取订单详情失败'
     ElMessage.error(msg)
+    detailVisible.value = false
   } finally {
-    statusLoading.value = false
+    detailLoading.value = false
   }
 }
 
-// ─── 退款弹窗 ─────────────────────────────────────────────────────────────
-
-const refundVisible = ref(false)
-const refundLoading = ref(false)
-const refundFormRef = ref<FormInstance>()
-const refundForm = reactive({ amount: '' })
-
-const maxRefundYuan = computed(() =>
-  currentOrder.value ? currentOrder.value.totalAmount / 100 : 0,
-)
-
-const refundRules: FormRules = {
-  amount: [
-    { required: true, message: '请输入退款金额', trigger: 'blur' },
-    {
-      validator: (_rule, value, callback) => {
-        const num = parseFloat(value)
-        if (isNaN(num) || num <= 0) {
-          callback(new Error('退款金额必须大于 0'))
-        } else if (num > maxRefundYuan.value) {
-          callback(new Error(`退款金额不能超过实付金额 ¥${maxRefundYuan.value.toFixed(2)}`))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'blur',
-    },
-  ],
-}
-
-function openRefund() {
-  refundForm.amount = ''
-  refundVisible.value = true
-}
-
-async function handleRefund() {
-  if (!refundFormRef.value || !currentOrder.value) return
-  const valid = await refundFormRef.value.validate().catch(() => false)
-  if (!valid) return
-
-  refundLoading.value = true
-  try {
-    // 将元转换为分（整数）
-    const amountFen = Math.round(parseFloat(refundForm.amount) * 100)
-    await ordersStore.refundOrder(currentOrder.value.id, amountFen)
-    // 刷新当前订单数据
-    const refreshed = ordersStore.orders.find((o) => o.id === currentOrder.value!.id)
-    if (refreshed) currentOrder.value = refreshed
-    refundVisible.value = false
-    ElMessage.success('退款申请已提交')
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : '退款失败，请稍后重试'
-    ElMessage.error(msg)
-  } finally {
-    refundLoading.value = false
-  }
+function handleOrderUpdate(updatedOrder: Order) {
+  currentOrder.value = updatedOrder
 }
 
 // ─── 工具函数 ─────────────────────────────────────────────────────────────
@@ -388,16 +229,16 @@ function statusLabel(status: OrderStatus): string {
 /** 订单状态对应的 Element Plus Tag 类型 */
 function statusTagType(
   status: OrderStatus,
-): 'info' | 'warning' | 'primary' | 'success' | 'danger' | '' {
-  const map: Record<OrderStatus, 'info' | 'warning' | 'primary' | 'success' | 'danger' | ''> = {
+): 'primary' | 'success' | 'info' | 'warning' | 'danger' {
+  const map: Record<OrderStatus, 'primary' | 'success' | 'info' | 'warning' | 'danger'> = {
     pending_payment: 'info',
     paid: 'warning',
     accepted: 'primary',
     completed: 'success',
     cancelled: 'danger',
-    refunded: '',
+    refunded: 'info',
   }
-  return map[status] ?? ''
+  return map[status] ?? 'info'
 }
 
 // ─── 生命周期 ─────────────────────────────────────────────────────────────
@@ -439,24 +280,5 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   padding: 16px;
-}
-
-.detail-desc {
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #303133;
-  margin: 16px 0 8px;
-}
-
-.action-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid #ebeef5;
 }
 </style>

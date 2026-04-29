@@ -99,7 +99,7 @@ const WS_CONFIG = {
   baseURL:
     process.env.NODE_ENV === "development"
       ? "http://localhost:7001"
-      : "https://api.example.com",
+      : "http://localhost:7001",
   reconnectionDelays: [1000, 2000, 4000, 8000, 30000], // 指数退避
 };
 ```

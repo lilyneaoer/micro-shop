@@ -5,7 +5,7 @@
 本系统是一套完整的餐饮店扫码点餐解决方案，由四个独立但协同工作的应用组成：
 
 - **Web 管理端（Web_Admin）**：Vue3 + Element Plus + Pinia + TypeScript，运行于浏览器，供商家管理菜品、订单及查看数据报表。
-- **顾客移动端（Customer_App）**：Taro + Vue + Taro UI + TypeScript，编译为微信小程序，供顾客扫码点餐。
+- **顾客移a动端（Customer_App）**：Taro + Vue + Taro UI + TypeScript，编译为微信小程序，供顾客扫码点餐。
 - **商家移动端（Merchant_App）**：Taro + Vue + Taro UI + TypeScript，编译为 app，供商家移动端接单处理。
 - **后端服务（Backend）**：Egg.js + PostgreSQL + TypeScript，提供统一的 RESTful API 和 WebSocket 实时推送。
 

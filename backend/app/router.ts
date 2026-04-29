@@ -47,7 +47,7 @@ export default (app: Application) => {
 
   // Order management routes (Requirements 3.5, 3.6, 3.7, 5.1, 5.4, 5.5, 5.6, 5.7)
   router.post('/api/orders', sessionAuthMiddleware, controller.order.create); // Customer: submit order
-  router.get('/api/orders/:id', controller.order.show); // Both JWT and session auth (handled in controller)
+  router.get('/api/orders/:id', optionalAuthMiddleware, controller.order.show); // Both JWT and session auth (handled in controller)
   router.get('/api/orders', authMiddleware, controller.order.index); // Merchant: get orders list
   router.put('/api/orders/:id/status', authMiddleware, controller.order.updateStatus); // Merchant: update status
   router.delete('/api/orders/:id', sessionAuthMiddleware, controller.order.destroy); // Customer: cancel order

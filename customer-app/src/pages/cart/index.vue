@@ -1,46 +1,53 @@
 <template>
-  <view class="cart-page">
+  <view :class="$style.cartPage">
     <!-- 空购物车状态 -->
-    <view v-if="cartStore.items.length === 0" class="empty-cart">
-      <view class="empty-icon">🛒</view>
-      <view class="empty-text">购物车是空的</view>
-      <view class="btn-back" @tap="goBack">返回菜单</view>
+    <view v-if="cartStore.items.length === 0" :class="$style.emptyCart">
+      <view :class="$style.emptyIcon">🛒</view>
+      <view :class="$style.emptyText">购物车是空的</view>
+      <view :class="$style.btnBack" @tap="goBack">返回菜单</view>
     </view>
 
     <!-- 购物车商品列表 -->
-    <view v-else class="cart-content">
-      <scroll-view class="cart-list" scroll-y>
+    <view v-else :class="$style.cartContent">
+      <scroll-view :class="$style.cartList" scroll-y>
         <view
           v-for="item in cartStore.items"
           :key="`${item.dishId}-${item.skuId || ''}`"
-          class="cart-item"
+          :class="$style.cartItem"
         >
-          <image
-            v-if="item.imageUrl"
-            :src="item.imageUrl"
-            class="item-image"
-            mode="aspectFill"
-          />
-          <view class="item-info">
-            <view class="item-name">{{ item.dishName }}</view>
-            <view v-if="item.skuName" class="item-sku">{{ item.skuName }}</view>
-            <view class="item-footer">
-              <view class="item-price">¥{{ formatPrice(item.unitPrice) }}</view>
-              <view class="quantity-control">
+          <!-- 商品图片或占位图 -->
+          <view :class="$style.itemImageWrapper">
+            <image
+              v-if="item.imageUrl"
+              :src="item.imageUrl"
+              :class="$style.itemImage"
+              mode="aspectFill"
+            />
+            <view v-else :class="$style.itemPlaceholder">
+              <view :class="$style.placeholderIcon">🍽️</view>
+            </view>
+          </view>
+          
+          <view :class="$style.itemInfo">
+            <view :class="$style.itemName">{{ item.dishName }}</view>
+            <view v-if="item.skuName" :class="$style.itemSku">{{ item.skuName }}</view>
+            <view :class="$style.itemFooter">
+              <view :class="$style.itemPrice">¥{{ formatPrice(item.unitPrice) }}</view>
+              <view :class="$style.quantityControl">
                 <view
-                  class="btn-minus"
+                  :class="$style.btnMinus"
                   @tap="decreaseQuantity(item)"
                 >
                   -
                 </view>
                 <input
-                  class="quantity-input"
+                  :class="$style.quantityInput"
                   type="number"
                   :value="item.quantity"
                   @blur="handleQuantityChange(item, $event)"
                 />
                 <view
-                  class="btn-plus"
+                  :class="$style.btnPlus"
                   @tap="increaseQuantity(item)"
                 >
                   +
@@ -48,23 +55,23 @@
               </view>
             </view>
           </view>
-          <view class="item-subtotal">
+          <view :class="$style.itemSubtotal">
             ¥{{ formatPrice(item.unitPrice * item.quantity) }}
           </view>
         </view>
       </scroll-view>
 
       <!-- 底部结算栏 -->
-      <view class="cart-footer">
-        <view class="footer-info">
-          <view class="total-label">总计</view>
-          <view class="total-amount">
+      <view :class="$style.cartFooter">
+        <view :class="$style.footerInfo">
+          <view :class="$style.totalLabel">总计</view>
+          <view :class="$style.totalAmount">
             ¥{{ formatPrice(cartStore.totalAmount) }}
           </view>
         </view>
-        <view class="footer-actions">
-          <view class="btn-clear" @tap="handleClearCart">清空</view>
-          <view class="btn-submit" @tap="goToOrderConfirm">提交订单</view>
+        <view :class="$style.footerActions">
+          <view :class="$style.btnClear" @tap="handleClearCart">清空</view>
+          <view :class="$style.btnSubmit" @tap="goToOrderConfirm">提交订单</view>
         </view>
       </view>
     </view>
@@ -188,15 +195,15 @@ function goToOrderConfirm() {
 }
 </script>
 
-<style lang="less" scoped>
-.cart-page {
+<style lang="less" module>
+.cartPage {
   display: flex;
   flex-direction: column;
   height: 100vh;
   background-color: #f5f5f5;
 }
 
-.empty-cart {
+.emptyCart {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -205,18 +212,18 @@ function goToOrderConfirm() {
   padding: 80rpx 0;
 }
 
-.empty-icon {
+.emptyIcon {
   font-size: 120rpx;
   margin-bottom: 32rpx;
 }
 
-.empty-text {
+.emptyText {
   font-size: 32rpx;
   color: #999;
   margin-bottom: 48rpx;
 }
 
-.btn-back {
+.btnBack {
   padding: 16rpx 48rpx;
   font-size: 28rpx;
   color: #fff;
@@ -224,18 +231,18 @@ function goToOrderConfirm() {
   border-radius: 48rpx;
 }
 
-.cart-content {
+.cartContent {
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-.cart-list {
+.cartList {
   flex: 1;
   padding: 0 0 160rpx 0;
 }
 
-.cart-item {
+.cartItem {
   display: flex;
   padding: 24rpx 32rpx;
   margin-bottom: 16rpx;
@@ -243,54 +250,76 @@ function goToOrderConfirm() {
   border-bottom: 1px solid #f5f5f5;
 }
 
-.item-image {
+.itemImageWrapper {
   width: 120rpx;
   height: 120rpx;
   margin-right: 24rpx;
-  border-radius: 8rpx;
   flex-shrink: 0;
 }
 
-.item-info {
+.itemImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+  object-fit: cover;
+}
+
+.itemPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  border-radius: 8rpx;
+  border: 2rpx dashed #d0d0d0;
+}
+
+.placeholderIcon {
+  font-size: 48rpx;
+  opacity: 0.5;
+}
+
+.itemInfo {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.item-name {
+.itemName {
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
   margin-bottom: 8rpx;
 }
 
-.item-sku {
+.itemSku {
   font-size: 24rpx;
   color: #999;
   margin-bottom: 16rpx;
 }
 
-.item-footer {
+.itemFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.item-price {
+.itemPrice {
   font-size: 28rpx;
   color: #ff6b35;
   font-weight: bold;
 }
 
-.quantity-control {
+.quantityControl {
   display: flex;
   align-items: center;
   gap: 16rpx;
 }
 
-.btn-minus,
-.btn-plus {
+.btnMinus,
+.btnPlus {
   width: 48rpx;
   height: 48rpx;
   display: flex;
@@ -302,7 +331,7 @@ function goToOrderConfirm() {
   border-radius: 50%;
 }
 
-.quantity-input {
+.quantityInput {
   width: 80rpx;
   height: 48rpx;
   text-align: center;
@@ -312,7 +341,7 @@ function goToOrderConfirm() {
   border-radius: 8rpx;
 }
 
-.item-subtotal {
+.itemSubtotal {
   width: 120rpx;
   text-align: right;
   font-size: 32rpx;
@@ -321,7 +350,7 @@ function goToOrderConfirm() {
   flex-shrink: 0;
 }
 
-.cart-footer {
+.cartFooter {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -331,30 +360,30 @@ function goToOrderConfirm() {
   box-shadow: 0 -2rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
-.footer-info {
+.footerInfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24rpx;
 }
 
-.total-label {
+.totalLabel {
   font-size: 28rpx;
   color: #666;
 }
 
-.total-amount {
+.totalAmount {
   font-size: 40rpx;
   font-weight: bold;
   color: #ff6b35;
 }
 
-.footer-actions {
+.footerActions {
   display: flex;
   gap: 24rpx;
 }
 
-.btn-clear {
+.btnClear {
   flex: 1;
   padding: 16rpx 0;
   text-align: center;
@@ -364,7 +393,7 @@ function goToOrderConfirm() {
   border-radius: 48rpx;
 }
 
-.btn-submit {
+.btnSubmit {
   flex: 2;
   padding: 16rpx 0;
   text-align: center;

@@ -127,7 +127,7 @@ export const useOrdersStore = defineStore('orders', () => {
     const wsUrl =
       process.env.NODE_ENV === 'development'
         ? 'http://localhost:7001'
-        : 'https://api.example.com'
+        : 'http://localhost:7001'
 
     console.log('Connecting to WebSocket:', wsUrl)
 
@@ -273,7 +273,7 @@ export const useOrdersStore = defineStore('orders', () => {
       }
 
       const response = await Taro.request({
-        url: `${process.env.NODE_ENV === 'development' ? 'http://localhost:7001' : 'https://api.example.com'}/api/orders`,
+        url: `${process.env.NODE_ENV === 'development' ? 'http://localhost:7001' : 'http://localhost:7001'}/api/orders`,
         method: 'GET',
         data: params,
         header: {
@@ -311,7 +311,7 @@ export const useOrdersStore = defineStore('orders', () => {
       }
 
       const response = await Taro.request({
-        url: `${process.env.NODE_ENV === 'development' ? 'http://localhost:7001' : 'https://api.example.com'}/api/orders/${orderId}`,
+        url: `${process.env.NODE_ENV === 'development' ? 'http://localhost:7001' : 'http://localhost:7001'}/api/orders/${orderId}`,
         method: 'GET',
         header: {
           Authorization: `Bearer ${token}`,
@@ -347,7 +347,7 @@ export const useOrdersStore = defineStore('orders', () => {
       }
 
       const response = await Taro.request({
-        url: `${process.env.NODE_ENV === 'development' ? 'http://localhost:7001' : 'https://api.example.com'}/api/orders/${orderId}/status`,
+        url: `${process.env.NODE_ENV === 'development' ? 'http://localhost:7001' : 'http://localhost:7001'}/api/orders/${orderId}/status`,
         method: 'PUT',
         data: {
           status: '已接单',
@@ -399,7 +399,7 @@ export const useOrdersStore = defineStore('orders', () => {
       }
 
       const response = await Taro.request({
-        url: `${process.env.NODE_ENV === 'development' ? 'http://localhost:7001' : 'https://api.example.com'}/api/orders/${orderId}/status`,
+        url: `${process.env.NODE_ENV === 'development' ? 'http://localhost:7001' : 'http://localhost:7001'}/api/orders/${orderId}/status`,
         method: 'PUT',
         data: {
           status: '已完成',

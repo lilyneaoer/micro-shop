@@ -1,68 +1,68 @@
 <template>
-  <view class="payment-page">
+  <view :class="$style.paymentPage">
     <!-- 加载状态 -->
-    <view v-if="isLoading" class="loading-container">
-      <view class="loading-spinner">⏳</view>
-      <view class="loading-text">正在准备支付...</view>
+    <view v-if="isLoading" :class="$style.loadingContainer">
+      <view :class="$style.loadingSpinner">⏳</view>
+      <view :class="$style.loadingText">正在准备支付...</view>
     </view>
 
     <!-- 订单信息 -->
-    <view v-else-if="order" class="payment-content">
+    <view v-else-if="order" :class="$style.paymentContent">
       <!-- 订单详情 -->
-      <view class="section order-info">
-        <view class="section-title">订单信息</view>
-        <view class="info-row">
-          <text class="info-label">订单编号</text>
-          <text class="info-value">{{ order.orderNo }}</text>
+      <view :class="[$style.section, $style.orderInfo]">
+        <view :class="$style.sectionTitle">订单信息</view>
+        <view :class="$style.infoRow">
+          <text :class="$style.infoLabel">订单编号</text>
+          <text :class="$style.infoValue">{{ order.orderNo }}</text>
         </view>
-        <view class="info-row">
-          <text class="info-label">桌号</text>
-          <text class="info-value">{{ order.tableNo }}</text>
+        <view :class="$style.infoRow">
+          <text :class="$style.infoLabel">桌号</text>
+          <text :class="$style.infoValue">{{ order.tableNo }}</text>
         </view>
-        <view class="info-row">
-          <text class="info-label">下单时间</text>
-          <text class="info-value">{{ formatTime(order.createdAt) }}</text>
+        <view :class="$style.infoRow">
+          <text :class="$style.infoLabel">下单时间</text>
+          <text :class="$style.infoValue">{{ formatTime(order.createdAt) }}</text>
         </view>
       </view>
 
       <!-- 商品列表 -->
-      <view class="section items-section">
-        <view class="section-title">商品清单</view>
+      <view :class="[$style.section, $style.itemsSection]">
+        <view :class="$style.sectionTitle">商品清单</view>
         <view
           v-for="(item, index) in order.items"
           :key="index"
-          class="item-row"
+          :class="$style.itemRow"
         >
-          <view class="item-name">
+          <view :class="$style.itemName">
             {{ item.dishName }}
-            <text v-if="item.skuName" class="item-sku">（{{ item.skuName }}）</text>
+            <text v-if="item.skuName" :class="$style.itemSku">（{{ item.skuName }}）</text>
           </view>
-          <view class="item-quantity">x{{ item.quantity }}</view>
-          <view class="item-price">¥{{ formatPrice(item.subtotal) }}</view>
+          <view :class="$style.itemQuantity">x{{ item.quantity }}</view>
+          <view :class="$style.itemPrice">¥{{ formatPrice(item.subtotal) }}</view>
         </view>
       </view>
 
       <!-- 应付金额 -->
-      <view class="section amount-section">
-        <view class="amount-row">
-          <text class="amount-label">应付金额</text>
-          <text class="amount-value">¥{{ formatPrice(order.totalAmount) }}</text>
+      <view :class="[$style.section, $style.amountSection]">
+        <view :class="$style.amountRow">
+          <text :class="$style.amountLabel">应付金额</text>
+          <text :class="$style.amountValue">¥{{ formatPrice(order.totalAmount) }}</text>
         </view>
       </view>
 
       <!-- 支付按钮 -->
-      <view class="payment-footer">
-        <view class="btn-pay" :class="{ disabled: isPaying }" @tap="handlePay">
+      <view :class="$style.paymentFooter">
+        <view :class="[$style.btnPay, { [$style.disabled]: isPaying }]" @tap="handlePay">
           {{ isPaying ? '支付中...' : '微信支付' }}
         </view>
       </view>
     </view>
 
     <!-- 错误状态 -->
-    <view v-else class="error-container">
-      <view class="error-icon">❌</view>
-      <view class="error-text">订单信息加载失败</view>
-      <view class="btn-back" @tap="goBack">返回</view>
+    <view v-else :class="$style.errorContainer">
+      <view :class="$style.errorIcon">❌</view>
+      <view :class="$style.errorText">订单信息加载失败</view>
+      <view :class="$style.btnBack" @tap="goBack">返回</view>
     </view>
   </view>
 </template>
@@ -234,15 +234,15 @@ onMounted(() => {
 })
 </script>
 
-<style lang="less" scoped>
-.payment-page {
+<style lang="less" module>
+.paymentPage {
   min-height: 100vh;
   background-color: #f5f5f5;
   padding-bottom: 160rpx;
 }
 
-.loading-container,
-.error-container {
+.loadingContainer,
+.errorContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -251,20 +251,20 @@ onMounted(() => {
   padding: 80rpx 0;
 }
 
-.loading-spinner,
-.error-icon {
+.loadingSpinner,
+.errorIcon {
   font-size: 120rpx;
   margin-bottom: 32rpx;
 }
 
-.loading-text,
-.error-text {
+.loadingText,
+.errorText {
   font-size: 32rpx;
   color: #999;
   margin-bottom: 48rpx;
 }
 
-.btn-back {
+.btnBack {
   padding: 16rpx 48rpx;
   font-size: 28rpx;
   color: #fff;
@@ -272,7 +272,7 @@ onMounted(() => {
   border-radius: 48rpx;
 }
 
-.payment-content {
+.paymentContent {
   padding-top: 16rpx;
 }
 
@@ -282,15 +282,15 @@ onMounted(() => {
   background-color: #fff;
 }
 
-.section-title {
+.sectionTitle {
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
   margin-bottom: 24rpx;
 }
 
-.order-info {
-  .info-row {
+.orderInfo {
+  .infoRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -302,19 +302,19 @@ onMounted(() => {
     }
   }
 
-  .info-label {
+  .infoLabel {
     font-size: 28rpx;
     color: #666;
   }
 
-  .info-value {
+  .infoValue {
     font-size: 28rpx;
     color: #333;
   }
 }
 
-.items-section {
-  .item-row {
+.itemsSection {
+  .itemRow {
     display: flex;
     align-items: center;
     padding: 16rpx 0;
@@ -325,24 +325,24 @@ onMounted(() => {
     }
   }
 
-  .item-name {
+  .itemName {
     flex: 1;
     font-size: 28rpx;
     color: #333;
   }
 
-  .item-sku {
+  .itemSku {
     font-size: 24rpx;
     color: #999;
   }
 
-  .item-quantity {
+  .itemQuantity {
     font-size: 28rpx;
     color: #666;
     margin: 0 24rpx;
   }
 
-  .item-price {
+  .itemPrice {
     font-size: 28rpx;
     font-weight: bold;
     color: #333;
@@ -351,27 +351,27 @@ onMounted(() => {
   }
 }
 
-.amount-section {
-  .amount-row {
+.amountSection {
+  .amountRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 16rpx 0;
   }
 
-  .amount-label {
+  .amountLabel {
     font-size: 32rpx;
     color: #666;
   }
 
-  .amount-value {
+  .amountValue {
     font-size: 48rpx;
     font-weight: bold;
     color: #ff6b35;
   }
 }
 
-.payment-footer {
+.paymentFooter {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -381,7 +381,7 @@ onMounted(() => {
   box-shadow: 0 -2rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
-.btn-pay {
+.btnPay {
   width: 100%;
   padding: 24rpx 0;
   text-align: center;

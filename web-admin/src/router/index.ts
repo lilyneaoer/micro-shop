@@ -37,12 +37,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/orders/index.vue'),
         meta: { requiresAuth: true, title: '订单管理' },
       },
-      {
-        path: 'stats',
-        name: 'Stats',
-        component: () => import('@/views/stats/index.vue'),
-        meta: { requiresAuth: true, title: '数据报表' },
-      },
     ],
   },
   // 404 重定向

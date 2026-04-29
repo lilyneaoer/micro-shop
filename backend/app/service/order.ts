@@ -2,6 +2,7 @@ import { Service } from 'egg';
 import { ErrorCode } from '../utils/response';
 import { OrderStatus } from '../model/order';
 import { Op, Transaction } from 'sequelize';
+import { modelToCamelCase } from '../utils/caseConverter';
 
 export interface OrderItemInput {
   dish_id: string;
@@ -313,11 +314,14 @@ export default class OrderService extends Service {
       },
     });
 
-    return {
+    const orderData = {
       ...order.toJSON(),
+      table_no: table?.table_no || null,
+      area: table?.area || null,
       items: orderItems.map((item) => item.toJSON()),
-      table: table ? { table_no: table.table_no, area: table.area } : null,
     };
+
+    return modelToCamelCase(orderData);
   }
 
   /**
@@ -355,6 +359,9 @@ export default class OrderService extends Service {
       }
     }
 
+    // Get total count
+    const total = await this.app.model.Order.count({ where });
+
     const orders: any[] = await this.app.model.Order.findAll({
       where,
       order: [['created_at', 'DESC']],
@@ -374,12 +381,18 @@ export default class OrderService extends Service {
 
     const tableMap = new Map(tables.map((table) => [table.id, table]));
 
-    return orders.map((order) => {
+    const list = orders.map((order) => {
       const table = tableMap.get(order.table_id);
       return {
         ...order.toJSON(),
-        table: table ? { table_no: table.table_no, area: table.area } : null,
+        table_no: table?.table_no || null,
+        area: table?.area || null,
       };
+    });
+
+    return modelToCamelCase({
+      list,
+      total,
     });
   }
 
@@ -537,9 +550,11 @@ export default class OrderService extends Service {
       orderItemsMap.get(item.order_id)!.push(item.toJSON());
     });
 
-    return orders.map((order) => ({
+    const result = orders.map((order) => ({
       ...order.toJSON(),
       items: orderItemsMap.get(order.id) || [],
     }));
+
+    return modelToCamelCase(result);
   }
 }

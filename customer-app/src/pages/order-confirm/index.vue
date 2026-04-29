@@ -1,55 +1,55 @@
 <template>
-  <view class="order-confirm-page">
+  <view :class="$style.orderConfirmPage">
     <!-- 桌台信息 -->
-    <view class="section table-info">
-      <view class="section-title">桌台信息</view>
-      <view class="table-detail">
-        <text class="table-no">{{ sessionStore.tableInfo?.tableNo || '-' }}</text>
-        <text v-if="sessionStore.tableInfo?.area" class="table-area">
+    <view :class="[$style.section, $style.tableInfo]">
+      <view :class="$style.sectionTitle">桌台信息</view>
+      <view :class="$style.tableDetail">
+        <text :class="$style.tableNo">{{ sessionStore.tableInfo?.tableNo || '-' }}</text>
+        <text v-if="sessionStore.tableInfo?.area" :class="$style.tableArea">
           {{ sessionStore.tableInfo.area }}
         </text>
       </view>
     </view>
 
     <!-- 订单商品列表 -->
-    <view class="section order-items">
-      <view class="section-title">订单详情</view>
+    <view :class="[$style.section, $style.orderItems]">
+      <view :class="$style.sectionTitle">订单详情</view>
       <view
         v-for="item in cartStore.items"
         :key="`${item.dishId}-${item.skuId || ''}`"
-        class="order-item"
+        :class="$style.orderItem"
       >
-        <view class="item-info">
-          <view class="item-name">{{ item.dishName }}</view>
-          <view v-if="item.skuName" class="item-sku">{{ item.skuName }}</view>
+        <view :class="$style.itemInfo">
+          <view :class="$style.itemName">{{ item.dishName }}</view>
+          <view v-if="item.skuName" :class="$style.itemSku">{{ item.skuName }}</view>
         </view>
-        <view class="item-quantity">x{{ item.quantity }}</view>
-        <view class="item-price">¥{{ formatPrice(item.unitPrice * item.quantity) }}</view>
+        <view :class="$style.itemQuantity">x{{ item.quantity }}</view>
+        <view :class="$style.itemPrice">¥{{ formatPrice(item.unitPrice * item.quantity) }}</view>
       </view>
     </view>
 
     <!-- 顾客备注 -->
-    <view class="section remark-section">
-      <view class="section-title">备注</view>
+    <view :class="[$style.section, $style.remarkSection]">
+      <view :class="$style.sectionTitle">备注</view>
       <textarea
         v-model="customerRemark"
-        class="remark-input"
+        :class="$style.remarkInput"
         placeholder="请输入备注信息（选填）"
         maxlength="200"
         :show-confirm-bar="false"
       />
-      <view class="remark-count">{{ customerRemark.length }}/200</view>
+      <view :class="$style.remarkCount">{{ customerRemark.length }}/200</view>
     </view>
 
     <!-- 总金额 -->
-    <view class="section total-section">
-      <view class="total-label">总计</view>
-      <view class="total-amount">¥{{ formatPrice(cartStore.totalAmount) }}</view>
+    <view :class="[$style.section, $style.totalSection]">
+      <view :class="$style.totalLabel">总计</view>
+      <view :class="$style.totalAmount">¥{{ formatPrice(cartStore.totalAmount) }}</view>
     </view>
 
     <!-- 提交按钮 -->
-    <view class="submit-footer">
-      <view class="btn-submit" :class="{ disabled: isSubmitting }" @tap="handleSubmitOrder">
+    <view :class="$style.submitFooter">
+      <view :class="[$style.btnSubmit, { [$style.disabled]: isSubmitting }]" @tap="handleSubmitOrder">
         {{ isSubmitting ? '提交中...' : '提交订单' }}
       </view>
     </view>
@@ -199,8 +199,8 @@ async function handleSubmitOrder() {
 }
 </script>
 
-<style lang="less" scoped>
-.order-confirm-page {
+<style lang="less" module>
+.orderConfirmPage {
   min-height: 100vh;
   background-color: #f5f5f5;
   padding-bottom: 160rpx;
@@ -212,34 +212,34 @@ async function handleSubmitOrder() {
   background-color: #fff;
 }
 
-.section-title {
+.sectionTitle {
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
   margin-bottom: 24rpx;
 }
 
-.table-info {
-  .table-detail {
+.tableInfo {
+  .tableDetail {
     display: flex;
     align-items: center;
     gap: 16rpx;
   }
 
-  .table-no {
+  .tableNo {
     font-size: 40rpx;
     font-weight: bold;
     color: #ff6b35;
   }
 
-  .table-area {
+  .tableArea {
     font-size: 28rpx;
     color: #666;
   }
 }
 
-.order-items {
-  .order-item {
+.orderItems {
+  .orderItem {
     display: flex;
     align-items: center;
     padding: 16rpx 0;
@@ -250,28 +250,28 @@ async function handleSubmitOrder() {
     }
   }
 
-  .item-info {
+  .itemInfo {
     flex: 1;
   }
 
-  .item-name {
+  .itemName {
     font-size: 28rpx;
     color: #333;
     margin-bottom: 8rpx;
   }
 
-  .item-sku {
+  .itemSku {
     font-size: 24rpx;
     color: #999;
   }
 
-  .item-quantity {
+  .itemQuantity {
     font-size: 28rpx;
     color: #666;
     margin: 0 24rpx;
   }
 
-  .item-price {
+  .itemPrice {
     font-size: 28rpx;
     font-weight: bold;
     color: #333;
@@ -280,8 +280,8 @@ async function handleSubmitOrder() {
   }
 }
 
-.remark-section {
-  .remark-input {
+.remarkSection {
+  .remarkInput {
     width: 100%;
     min-height: 160rpx;
     padding: 16rpx;
@@ -292,7 +292,7 @@ async function handleSubmitOrder() {
     box-sizing: border-box;
   }
 
-  .remark-count {
+  .remarkCount {
     margin-top: 8rpx;
     font-size: 24rpx;
     color: #999;
@@ -300,25 +300,25 @@ async function handleSubmitOrder() {
   }
 }
 
-.total-section {
+.totalSection {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 32rpx;
 
-  .total-label {
+  .totalLabel {
     font-size: 32rpx;
     color: #666;
   }
 
-  .total-amount {
+  .totalAmount {
     font-size: 48rpx;
     font-weight: bold;
     color: #ff6b35;
   }
 }
 
-.submit-footer {
+.submitFooter {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -328,7 +328,7 @@ async function handleSubmitOrder() {
   box-shadow: 0 -2rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
-.btn-submit {
+.btnSubmit {
   width: 100%;
   padding: 24rpx 0;
   text-align: center;

@@ -310,6 +310,7 @@ export interface Order {
   orderNo: string
   tableId: string
   tableNo: string
+  area: string
   totalAmount: number // 单位：分
   status: OrderStatus
   customerRemark: string
@@ -345,21 +346,21 @@ export const orderApi = {
 // ─── 数据统计接口 ────────────────────────────────────────────────────────────
 
 export interface DashboardData {
-  today_revenue: number // 单位：分
-  today_order_count: number
-  today_avg_order_value: number // 单位：分
-  month_revenue: number // 单位：分
+  todayRevenue: number // 单位：分
+  todayOrderCount: number
+  todayAvgOrderValue: number // 单位：分
+  monthRevenue: number // 单位：分
 }
 
 export interface RevenuePoint {
   date: string
   revenue: number // 单位：分
-  order_count: number
+  orderCount: number
 }
 
 export interface DishRankItem {
-  dish_id: string
-  dish_name: string
+  dishId: string
+  dishName: string
   quantity: number
   revenue: number // 单位：分
 }

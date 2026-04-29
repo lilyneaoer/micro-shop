@@ -1,58 +1,58 @@
 <template>
-  <view class="order-list-page">
+  <view :class="$style.orderListPage">
     <!-- 空状态 -->
-    <view v-if="orders.length === 0" class="empty-state">
-      <view class="empty-icon">📋</view>
-      <text class="empty-text">暂无订单</text>
-      <text class="empty-hint">扫码点餐后，订单将显示在这里</text>
+    <view v-if="orders.length === 0" :class="$style.emptyState">
+      <view :class="$style.emptyIcon">📋</view>
+      <text :class="$style.emptyText">暂无订单</text>
+      <text :class="$style.emptyHint">扫码点餐后，订单将显示在这里</text>
     </view>
 
     <!-- 订单列表 -->
-    <view v-else class="order-list">
+    <view v-else :class="$style.orderList">
       <view
         v-for="order in orders"
         :key="order.id"
-        class="order-card"
+        :class="$style.orderCard"
         @tap="handleOrderTap(order)"
       >
         <!-- 订单头部 -->
-        <view class="order-header">
-          <view class="order-info">
-            <text class="order-no">订单号：{{ order.orderNo }}</text>
-            <text class="table-no">{{ order.tableNo }}</text>
+        <view :class="$style.orderHeader">
+          <view :class="$style.orderInfo">
+            <text :class="$style.orderNo">订单号：{{ order.orderNo }}</text>
+            <text :class="$style.tableNo">{{ order.tableNo }}</text>
           </view>
-          <view :class="['order-status', `status-${order.status}`]">
+          <view :class="[$style.orderStatus, $style[`status${order.status}`]]">
             {{ ordersStore.getStatusText(order.status) }}
           </view>
         </view>
 
         <!-- 订单项列表 -->
-        <view class="order-items">
+        <view :class="$style.orderItems">
           <view
             v-for="(item, index) in order.items"
             :key="index"
-            class="order-item"
+            :class="$style.orderItem"
           >
-            <view class="item-info">
-              <text class="item-name">{{ item.dishName }}</text>
-              <text v-if="item.skuName" class="item-sku">{{ item.skuName }}</text>
+            <view :class="$style.itemInfo">
+              <text :class="$style.itemName">{{ item.dishName }}</text>
+              <text v-if="item.skuName" :class="$style.itemSku">{{ item.skuName }}</text>
             </view>
-            <view class="item-quantity">x{{ item.quantity }}</view>
-            <view class="item-price">¥{{ (item.subtotal / 100).toFixed(2) }}</view>
+            <view :class="$style.itemQuantity">x{{ item.quantity }}</view>
+            <view :class="$style.itemPrice">¥{{ (item.subtotal / 100).toFixed(2) }}</view>
           </view>
         </view>
 
         <!-- 订单底部 -->
-        <view class="order-footer">
-          <view class="order-total">
-            <text class="total-label">合计：</text>
-            <text class="total-amount">¥{{ (order.totalAmount / 100).toFixed(2) }}</text>
+        <view :class="$style.orderFooter">
+          <view :class="$style.orderTotal">
+            <text :class="$style.totalLabel">合计：</text>
+            <text :class="$style.totalAmount">¥{{ (order.totalAmount / 100).toFixed(2) }}</text>
           </view>
-          <view class="order-actions">
+          <view :class="$style.orderActions">
             <!-- 待支付状态可以取消订单 -->
             <button
               v-if="order.status === OrderStatus.PENDING_PAYMENT"
-              class="btn-cancel"
+              :class="$style.btnCancel"
               size="mini"
               @tap.stop="handleCancelOrder(order)"
             >
@@ -62,7 +62,7 @@
         </view>
 
         <!-- 订单时间 -->
-        <view class="order-time">
+        <view :class="$style.orderTime">
           <text>下单时间：{{ formatTime(order.createdAt) }}</text>
         </view>
       </view>
@@ -229,47 +229,47 @@ function formatTime(isoString: string): string {
 }
 </script>
 
-<style lang="less" scoped>
-.order-list-page {
+<style lang="less" module>
+.orderListPage {
   min-height: 100vh;
   background-color: #f5f5f5;
   padding: 32rpx;
 }
 
 /* 空状态 */
-.empty-state {
+.emptyState {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 200rpx 0;
 
-  .empty-icon {
+  .emptyIcon {
     font-size: 120rpx;
     margin-bottom: 32rpx;
   }
 
-  .empty-text {
+  .emptyText {
     font-size: 32rpx;
     color: #333;
     margin-bottom: 16rpx;
   }
 
-  .empty-hint {
+  .emptyHint {
     font-size: 28rpx;
     color: #999;
   }
 }
 
 /* 订单列表 */
-.order-list {
+.orderList {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
 }
 
 /* 订单卡片 */
-.order-card {
+.orderCard {
   background-color: #fff;
   border-radius: 16rpx;
   padding: 32rpx;
@@ -277,7 +277,7 @@ function formatTime(isoString: string): string {
 }
 
 /* 订单头部 */
-.order-header {
+.orderHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -285,55 +285,55 @@ function formatTime(isoString: string): string {
   padding-bottom: 24rpx;
   border-bottom: 1rpx solid #f0f0f0;
 
-  .order-info {
+  .orderInfo {
     display: flex;
     flex-direction: column;
     gap: 8rpx;
 
-    .order-no {
+    .orderNo {
       font-size: 28rpx;
       color: #666;
     }
 
-    .table-no {
+    .tableNo {
       font-size: 32rpx;
       color: #333;
       font-weight: 500;
     }
   }
 
-  .order-status {
+  .orderStatus {
     padding: 8rpx 24rpx;
     border-radius: 8rpx;
     font-size: 28rpx;
     font-weight: 500;
 
-    &.status-pending_payment {
+    &.statuspending_payment {
       background-color: #fff7e6;
       color: #fa8c16;
     }
 
-    &.status-paid_pending_accept {
+    &.statuspaid_pending_accept {
       background-color: #e6f7ff;
       color: #1890ff;
     }
 
-    &.status-accepted_in_progress {
+    &.statusaccepted_in_progress {
       background-color: #f6ffed;
       color: #52c41a;
     }
 
-    &.status-completed {
+    &.statuscompleted {
       background-color: #f0f0f0;
       color: #8c8c8c;
     }
 
-    &.status-cancelled {
+    &.statuscancelled {
       background-color: #fff1f0;
       color: #f5222d;
     }
 
-    &.status-refunded {
+    &.statusrefunded {
       background-color: #f9f0ff;
       color: #722ed1;
     }
@@ -341,41 +341,41 @@ function formatTime(isoString: string): string {
 }
 
 /* 订单项列表 */
-.order-items {
+.orderItems {
   display: flex;
   flex-direction: column;
   gap: 16rpx;
   margin-bottom: 24rpx;
 }
 
-.order-item {
+.orderItem {
   display: flex;
   align-items: center;
   gap: 16rpx;
 
-  .item-info {
+  .itemInfo {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 4rpx;
 
-    .item-name {
+    .itemName {
       font-size: 30rpx;
       color: #333;
     }
 
-    .item-sku {
+    .itemSku {
       font-size: 26rpx;
       color: #999;
     }
   }
 
-  .item-quantity {
+  .itemQuantity {
     font-size: 28rpx;
     color: #666;
   }
 
-  .item-price {
+  .itemPrice {
     font-size: 30rpx;
     color: #333;
     font-weight: 500;
@@ -385,35 +385,35 @@ function formatTime(isoString: string): string {
 }
 
 /* 订单底部 */
-.order-footer {
+.orderFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-top: 24rpx;
   border-top: 1rpx solid #f0f0f0;
 
-  .order-total {
+  .orderTotal {
     display: flex;
     align-items: baseline;
     gap: 8rpx;
 
-    .total-label {
+    .totalLabel {
       font-size: 28rpx;
       color: #666;
     }
 
-    .total-amount {
+    .totalAmount {
       font-size: 36rpx;
       color: #ff4d4f;
       font-weight: 600;
     }
   }
 
-  .order-actions {
+  .orderActions {
     display: flex;
     gap: 16rpx;
 
-    .btn-cancel {
+    .btnCancel {
       background-color: #fff;
       color: #ff4d4f;
       border: 1rpx solid #ff4d4f;
@@ -425,7 +425,7 @@ function formatTime(isoString: string): string {
 }
 
 /* 订单时间 */
-.order-time {
+.orderTime {
   margin-top: 16rpx;
   font-size: 26rpx;
   color: #999;

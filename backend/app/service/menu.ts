@@ -1,6 +1,7 @@
 import { Service } from 'egg';
 import { ErrorCode } from '../utils/response';
 import { Op } from 'sequelize';
+import { modelToCamelCase } from '../utils/caseConverter';
 
 export interface CreateCategoryInput {
   name: string;
@@ -21,6 +22,11 @@ export interface CreateDishInput {
   is_available?: boolean;
   has_sku?: boolean;
   sort_order?: number;
+  skus?: Array<{
+    name: string;
+    price_delta: number;
+    is_available?: boolean;
+  }>;
 }
 
 export interface UpdateDishInput {
@@ -32,6 +38,11 @@ export interface UpdateDishInput {
   is_available?: boolean;
   has_sku?: boolean;
   sort_order?: number;
+  skus?: Array<{
+    name: string;
+    price_delta: number;
+    is_available?: boolean;
+  }>;
 }
 
 export default class MenuService extends Service {
@@ -46,7 +57,7 @@ export default class MenuService extends Service {
       sort_order: input.sort_order ?? 0,
     } as any);
 
-    return category;
+    return modelToCamelCase(category);
   }
 
   /**
@@ -62,7 +73,7 @@ export default class MenuService extends Service {
       ],
     });
 
-    return categories;
+    return modelToCamelCase(categories);
   }
 
   /**
@@ -98,7 +109,7 @@ export default class MenuService extends Service {
     }
 
     await category.save();
-    return category;
+    return modelToCamelCase(category);
   }
 
   /**
@@ -150,7 +161,21 @@ export default class MenuService extends Service {
       sort_order: input.sort_order ?? 0,
     } as any);
 
-    return dish;
+    // Create SKUs if provided
+    if (input.has_sku && input.skus && input.skus.length > 0) {
+      await Promise.all(
+        input.skus.map(sku =>
+          this.app.model.Sku.create({
+            dish_id: dish.id,
+            name: sku.name,
+            price_delta: sku.price_delta,
+            is_available: sku.is_available ?? true,
+          } as any),
+        ),
+      );
+    }
+
+    return modelToCamelCase(dish);
   }
 
   /**
@@ -170,13 +195,26 @@ export default class MenuService extends Service {
 
     const dishes = await this.app.model.Dish.findAll({
       where,
+      include: [
+        {
+          model: this.app.model.Sku,
+          as: 'skus',
+          required: false,
+        },
+        {
+          model: this.app.model.Category,
+          as: 'category',
+          attributes: ['id', 'name', 'sort_order'],
+          required: false,
+        },
+      ],
       order: [
         ['sort_order', 'ASC'],
         ['created_at', 'ASC'],
       ],
     });
 
-    return dishes;
+    return modelToCamelCase(dishes);
   }
 
   /**
@@ -188,6 +226,13 @@ export default class MenuService extends Service {
         id: dishId,
         merchant_id: merchantId,
       },
+      include: [
+        {
+          model: this.app.model.Sku,
+          as: 'skus',
+          required: false,
+        },
+      ],
     });
 
     return dish;
@@ -236,7 +281,32 @@ export default class MenuService extends Service {
     }
 
     await dish.save();
-    return dish;
+
+    // Update SKUs if provided
+    if (input.skus !== undefined) {
+      // Delete existing SKUs
+      await this.app.model.Sku.destroy({
+        where: { dish_id: dishId },
+      });
+
+      // Create new SKUs
+      if (input.skus.length > 0) {
+        await Promise.all(
+          input.skus.map(sku =>
+            this.app.model.Sku.create({
+              dish_id: dishId,
+              name: sku.name,
+              price_delta: sku.price_delta,
+              is_available: sku.is_available ?? true,
+            } as any),
+          ),
+        );
+      }
+    }
+
+    // Re-fetch dish with SKUs to get updated data
+    const updatedDish = await this.getDishById(merchantId, dishId);
+    return updatedDish;
   }
 
   /**

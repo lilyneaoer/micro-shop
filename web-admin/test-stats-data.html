@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stats Chart Test</title>
+  <script src="https://unpkg.com/@antv/g2@5.2.1/dist/g2.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .chart-container {
+      width: 100%;
+      height: 400px;
+      margin-bottom: 40px;
+      border: 1px solid #ddd;
+    }
+    h2 {
+      margin-top: 30px;
+    }
+    .data-preview {
+      background: #f5f5f5;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>数据报表图表测试</h1>
+  
+  <h2>1. 营业额趋势图</h2>
+  <div class="data-preview" id="revenue-data"></div>
+  <div id="revenue-chart" class="chart-container"></div>
+  
+  <h2>2. 菜品销量排行图</h2>
+  <div class="data-preview" id="dish-data"></div>
+  <div id="dish-chart" class="chart-container"></div>
+
+  <script>
+    const { Chart } = G2;
+
+    // 模拟后端返回的数据（已经过 camelCase 转换）
+    const revenueData = [
+      { date: '2026-04-20', revenue: 318100, orderCount: 37 },
+      { date: '2026-04-21', revenue: 339300, orderCount: 39 },
+      { date: '2026-04-22', revenue: 269100, orderCount: 29 },
+      { date: '2026-04-23', revenue: 288400, orderCount: 38 },
+      { date: '2026-04-24', revenue: 280800, orderCount: 34 },
+      { date: '2026-04-25', revenue: 365000, orderCount: 42 },
+      { date: '2026-04-26', revenue: 291800, orderCount: 35 },
+    ];
+
+    const dishData = [
+      { dishId: '1', dishName: '可乐', quantity: 123, revenue: 61500 },
+      { dishId: '2', dishName: '宫保鸡丁', quantity: 108, revenue: 410400 },
+      { dishId: '3', dishName: '皮蛋', quantity: 101, revenue: 202000 },
+      { dishId: '4', dishName: '拍黄瓜', quantity: 99, revenue: 118800 },
+      { dishId: '5', dishName: '鲜榨果汁', quantity: 92, revenue: 138000 },
+      { dishId: '6', dishName: '糖醋里脊', quantity: 78, revenue: 327600 },
+    ];
+
+    // 显示原始数据
+    document.getElementById('revenue-data').textContent = 
+      '原始数据:\n' + JSON.stringify(revenueData.slice(0, 3), null, 2) + '\n...';
+    document.getElementById('dish-data').textContent = 
+      '原始数据:\n' + JSON.stringify(dishData.slice(0, 3), null, 2) + '\n...';
+
+    // 转换函数
+    function formatAmount(fen) {
+      return fen / 100;
+    }
+
+    // 1. 渲染营业额趋势图（复合图表：营业额折线 + 订单数柱状，双 Y 轴独立刻度）
+    function renderRevenueChart() {
+      // 准备数据：分别准备营业额和订单数的数据
+      const revenueChartData = revenueData.map(item => ({
+        date: item.date,
+        value: formatAmount(item.revenue),
+        type: '营业额（元）',
+      }));
+
+      const orderChartData = revenueData.map(item => ({
+        date: item.date,
+        value: item.orderCount,
+        type: '订单数',
+      }));
+
+      console.log('Revenue chart data:', revenueChartData);
+      console.log('Order chart data:', orderChartData);
+
+      // 创建图表
+      const chart = new Chart({
+        container: 'revenue-chart',
+        autoFit: true,
+      });
+
+      // 添加柱状图（订单数）- 使用独立的 Y 轴刻度
+      chart
+        .interval()
+        .data(orderChartData)
+        .encode('x', 'date')
+        .encode('y', 'value')
+        .scale('y', { 
+          independent: true,  // 独立刻度
+          nice: true,
+        })
+        .scale('x', {
+          paddingInner: 0.6,  // 柱子之间的间距（0-1，值越大柱子越窄）
+          paddingOuter: 0.3,  // 两端的间距
+        })
+        .style('fill', '#67C23A')
+        .style('fillOpacity', 0.6)
+        .style('maxWidth', 30)  // 限制柱子最大宽度为 30px
+        .axis('y', {
+          title: '订单数',
+          position: 'right',
+          grid: null,  // 不显示网格线
+        })
+        .tooltip({ name: '订单数', channel: 'y' });
+
+      // 添加折线图（营业额）- 使用独立的 Y 轴刻度
+      chart
+        .line()
+        .data(revenueChartData)
+        .encode('x', 'date')
+        .encode('y', 'value')
+        .encode('shape', 'smooth')
+        .scale('y', { 
+          independent: true,  // 独立刻度
+          nice: true,
+        })
+        .style('stroke', '#409EFF')
+        .style('lineWidth', 3)
+        .axis('y', {
+          title: '营业额（元）',
+          position: 'left',
+        })
+        .tooltip({ name: '营业额（元）', channel: 'y' });
+
+      // 添加折线上的点
+      chart
+        .point()
+        .data(revenueChartData)
+        .encode('x', 'date')
+        .encode('y', 'value')
+        .scale('y', { 
+          independent: true,  // 独立刻度
+          nice: true,
+        })
+        .style('fill', '#409EFF')
+        .style('r', 3)
+        .axis('y', false)  // 隐藏 Y 轴（折线图已显示）
+        .tooltip(false);
+
+      chart.render();
+    }
+
+    // 2. 渲染菜品销量图
+    function renderDishChart() {
+      // 按营业额从高到低排序
+      const sortedData = [...dishData].sort((a, b) => b.revenue - a.revenue);
+      
+      // 准备数据
+      const chartData = [];
+      sortedData.forEach(item => {
+        chartData.push({
+          dishName: item.dishName,
+          type: '销量',
+          value: item.quantity,
+        });
+        chartData.push({
+          dishName: item.dishName,
+          type: '营业额（元）',
+          value: formatAmount(item.revenue),
+        });
+      });
+
+      console.log('Dish chart data:', chartData);
+
+      // 创建图表
+      const chart = new Chart({
+        container: 'dish-chart',
+        autoFit: true,
+      });
+
+      chart
+        .interval()
+        .data(chartData)
+        .encode('x', 'dishName')
+        .encode('y', 'value')
+        .encode('color', 'type')
+        .transform({ type: 'dodgeX' })
+        .scale('color', {
+          range: ['#409EFF', '#67C23A'],
+        })
+        .scale('x', {
+          paddingInner: 0.4,  // 分组之间的间距
+          paddingOuter: 0.2,  // 两端的间距
+        })
+        .style('maxWidth', 25)  // 限制每个柱子最大宽度为 25px
+        .axis('x', {
+          labelFormatter: (text) => {
+            return text.length > 6 ? text.substring(0, 6) + '...' : text;
+          },
+          labelTransform: 'rotate(30)',
+        })
+        .axis('y', {
+          title: '数值',
+        })
+        .legend('color', {
+          position: 'top',
+        });
+
+      chart.render();
+    }
+
+    // 渲染图表
+    renderRevenueChart();
+    renderDishChart();
+  </script>
+</body>
+</html>
