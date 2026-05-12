@@ -49,8 +49,8 @@ stages:
         displayName: Nodejs 构建
         nodeVersion: 24.5.0
         commands:
-          - 切换目录
-          - cd customer-app
+          - '切换目录'
+          - cd customer-app && pwd
           - '# 设置NPM源，提升安装速度'
           - npm config set registry https://registry.npmmirror.com
           - ''
