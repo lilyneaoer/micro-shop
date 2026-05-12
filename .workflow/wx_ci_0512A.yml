@@ -49,7 +49,7 @@ stages:
         displayName: Nodejs 构建
         nodeVersion: 22.22.0
         commands:
-          - 切换目录, 检查node版本
+          - '切换目录, 检查node版本'
           - cd customer-app && pwd && node -v
           - '# 设置NPM源，提升安装速度'
           - npm config set registry https://registry.npmmirror.com
@@ -62,10 +62,10 @@ stages:
           - npm install miniprogram-ci qrcode axios --save --legacy-peer-deps
           - ''
           - '# 发布'
-          - NODE_REAL=$(which node)
-          - EXPECT_PATH="/mnt/pipeline-tools/standard/node/22.22.0/bin"
-          - mkdir -p $EXPECT_PATH
-          - ln -sf $NODE_REAL $EXPECT_PATH/node 
+          #- NODE_REAL=$(which node)
+          #- EXPECT_PATH="/mnt/pipeline-tools/standard/node/22.22.0/bin"
+          #- mkdir -p $EXPECT_PATH
+          #- ln -sf $NODE_REAL $EXPECT_PATH/node
           - node scripts/ci-publish.js
         artifacts:
           - name: BUILD_ARTIFACT
