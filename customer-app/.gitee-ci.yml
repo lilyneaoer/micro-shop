@@ -1,0 +1,74 @@
+version: "1.0"
+name: wx_ci_0512A
+displayName: 微信小程序自动构建上传
+triggers:
+  trigger: auto
+  push:
+    branches:
+      prefix:
+        - ""
+variables:
+  WX_APPID: wx00060455481f37a2
+  WX_PRIVATE_KEY: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpQIBAAKCAQEAwyPc9Q5sKDeBX4NENDkD2A8sKsFdQ+QqZF5XUE0l2YJmnMsD
+    8TvbWtDSPFcp9E2LSTMfgcLnKNFR9UEaXgINrmlHqBsJmUzIETOwxuMFTlmjE5FQ
+    5MCIQs7/cmhbn9W4m7AZB5kPLdUqWRMmUHX/tjgsTnB6FNV3k45e8NDM20+4Mh3f
+    M8mM8m9F71AJEdF9KUazHAoHJ07xtV+bVfdF/uGTIf3dMcGh4jobGU8lxYeKQYc7
+    r5+R7SuOW2J34RMPO2JTSfAu7ptnC1aSvcm8FIRIMVwaDcmjhATsDBll3d9hlzRW
+    bVOGko2sZmbDdbmAF0k3hsUz4tgXIDQUMR55jwIDAQABAoIBAQC3hYvxgD3h2Mm4
+    TRig0Jo34ZUVJMOU7QmdWUhegh+9nzDn9tpfTn7uuwNtskAHvcHn9seD3wxNTAb7
+    U937WY0KYYL9q2fsn9RssSNo+Ortk8mVxo3AhP3hbxG4xEKfYH19FjGD/sPSw+5O
+    1X6sHz19Xvj0UD3QSC5sPHI3ovd2rKvWHEXLoRYnFYRKRW8YGbKTlNceuNVbh1mO
+    HShJLvrXBOCB2y3P+uPBbseeGo++i2Ixcyu+2utg0Aah0OcKYh+EiKl2mC6egKfY
+    MFCWk3Cweqr4WT51ejNoDjRxHZk/FfZ526Z7EKtpsykaiHvKcYqdLVT4kRBGnp6R
+    hBH84TxRAoGBAP43kYmXwneMZe4lKAsLjSTxZiWFKGm3sKu0dr82Xb/HO6TEHYaD
+    4XniyeW6Wa5sgSAv+S0Ff0FKJTl8Gs96iUR5KuN+CMxKxSHuORUrW8EtrD4O/XoJ
+    F//W64aqAjBrGkGjqbOvykFiyyQdDh3ElZ1fWy5dzidxpMgBg9wItU93AoGBAMSC
+    Oba0tUo4zWG1hdnoYA3IU0cYF5010MAaAqONM2PX2Fb7S3ADyZqagrU4RcZCZXa4
+    hPGYHjy+JCKVG+KE4Pc8T8awwyZA+HBymw9AcrF0vOcrj3Zo7m0T2pbRDQKufOoF
+    8wLoPNCpxkAkSmUxW1rr5gCYkJqDcFXeZNgQJBypAoGBAKBwT5Cnz5qFaBsZJiF6
+    Y9TJ6S6K0EuQG5byKPNai2YqhjDheMTZXKcBA2zR5CGZ5xB6VmccjgiVk9KoyX7i
+    Fdm6IuA6PbE5Cxrz7uC2YY0Ulxz/dufa72OOr0xo5ULLhWGhuctmiV4kzJH5KFyP
+    IeGVOcWUfDQWm+mCU0a91DfXAoGAHzIdP2gIr7O8xxouGZ3OQeHfdpXYidiVPynh
+    6VztH5iQe56BJ1MymhyVS3eXfBXmTaaVVFU116bHzcWmG5vEqvskHwLIuDXwOsm2
+    3AD7NDi4FGrR55ZY43AXb4HYcuiIZA51uaxsmyOYmW4pcU8YlaKFbOrLafwbxUX8
+    9F/7m6ECgYEA/Rlo6d0l0eQzj2E+VZjtJxJTaCLM788ph+3CkSlfry/GsC0E/FNg
+    8795ZEnpuU0x0znIXly28ELhsBK4gyazGySll4zEFjAVD6RqU/gUkwBiJObNE1Eh
+    acL7R9+fg0Df6G/F4k3ckKzbXxYFy4+xFESNhcBUL/dkW3DNOiNbHUM=
+    -----END RSA PRIVATE KEY-----
+  WECOM_WEBHOOK: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=c0585db8-1051-4d46-8e4c-13e0e388b6ef
+stages:
+  - name: build
+    displayName: 构建发布
+    strategy: naturally
+    trigger: auto
+    steps:
+      - step: build@nodejs
+        name: build_nodejs
+        displayName: Nodejs 构建
+        nodeVersion: 24.5.0
+        commands:
+          - 切换目录
+          - cd customer-app && pwd
+          - "# 设置NPM源，提升安装速度"
+          - npm config set registry https://registry.npmmirror.com
+          - ""
+          - "# 执行编译命令"
+          - npm install && npm run build:weapp
+          - ""
+          - "# 安装小程序相关工具"
+          - npm install miniprogram-ci qrcode axios --save
+          - ""
+          - "# 发布"
+          - node scripts/ci-publish.js
+        artifacts:
+          - name: BUILD_ARTIFACT
+            path:
+              - ./dist
+        caches:
+          - ~/.npm
+          - ~/.yarn
+        notify: []
+        strategy:
+          retry: "0"
