@@ -1,4 +1,4 @@
-version: "1.0"
+version: '1.0'
 name: wx_ci_0512A
 displayName: 微信小程序自动构建上传
 triggers:
@@ -6,7 +6,7 @@ triggers:
   push:
     branches:
       prefix:
-        - ""
+        - ''
 variables:
   WX_APPID: wx00060455481f37a2
   WX_PRIVATE_KEY: |
@@ -51,16 +51,16 @@ stages:
         commands:
           - 切换目录
           - cd customer-app && pwd
-          - "# 设置NPM源，提升安装速度"
+          - '# 设置NPM源，提升安装速度'
           - npm config set registry https://registry.npmmirror.com
-          - ""
-          - "# 执行编译命令"
+          - ''
+          - '# 执行编译命令'
           - npm install --legacy-peer-deps && npm run build:weapp
-          - ""
-          - "# 安装小程序相关工具"
-          - npm install miniprogram-ci qrcode axios --save
-          - ""
-          - "# 发布"
+          - ''
+          - '# 安装小程序相关工具'
+          - npm install miniprogram-ci qrcode axios --save --legacy-peer-deps
+          - ''
+          - '# 发布'
           - node scripts/ci-publish.js
         artifacts:
           - name: BUILD_ARTIFACT
@@ -71,4 +71,4 @@ stages:
           - ~/.yarn
         notify: []
         strategy:
-          retry: "0"
+          retry: '0'
