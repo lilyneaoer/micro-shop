@@ -47,7 +47,7 @@ stages:
       - step: build@nodejs
         name: build_nodejs
         displayName: Nodejs 构建
-        nodeVersion: 24.5.0
+        nodeVersion: 22.22.0
         commands:
           - 切换目录
           - cd customer-app && pwd
