@@ -1,7 +1,7 @@
 version: '1.0'
 name: wx_ci_0512A
 displayName: 微信小程序自动构建上传
-nodeVersion: v22.20.0
+nodeVersion: 22.20.0
 triggers:
   trigger: auto
   push:
