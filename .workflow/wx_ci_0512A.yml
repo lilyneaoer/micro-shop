@@ -58,7 +58,7 @@ stages:
           - npm install --legacy-peer-deps && npm run build:weapp
           - ''
           - '# 安装小程序相关工具'
-          - npm install miniprogram-ci qrcode axios --save --legacy-peer-deps
+          - npm install miniprogram-ci@latest qrcode axios --save --legacy-peer-deps
           - ''
           - '# 发布'
           - node scripts/ci-publish.js
