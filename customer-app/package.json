@@ -12,6 +12,7 @@
     "build:weapp": "taro build --type weapp",
     "build:weapp:watch": "npm run build:weapp -- --watch",
     "dev:weapp": "npm run build:weapp -- --watch",
+    "ci:publish": "node scripts/ci-publish.js",
     "test": "vitest --run",
     "test:watch": "vitest",
     "lint": "eslint --ext .vue,.js,.ts src",

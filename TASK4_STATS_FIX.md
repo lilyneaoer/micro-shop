@@ -2,7 +2,7 @@
 
 ## 问题描述
 
-数据报表页面（`web-admin/src/views/stats/index.vue`）的营业额趋势图无法正常显示营业额和订单数。
+数据 报表页面（`web-admin/src/views/stats/index.vue`）的营业额趋势图无法正常显示营业额和订单数。
 
 ## 根本原因
 

@@ -1,0 +1,38 @@
+name: 微信小程序自动发布
+
+on:
+  push:
+    branches:
+      - dev # 测试版
+      - main # 正式体验版
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: 安装依赖
+        run: npm install
+
+      - name: 编译小程序
+        run: npm run build:weapp
+
+      - name: 安装CI工具
+        run: npm install miniprogram-ci qrcode axios --save-dev
+
+      - name: 自动上传 + 企微推送
+        env:
+          WX_APPID: ${{ secrets.WX_APPID }}
+          WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
+          WECOM_WEBHOOK: ${{ secrets.WECOM_WEBHOOK }}
+          GITHUB_COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: node scripts/ci-publish.js

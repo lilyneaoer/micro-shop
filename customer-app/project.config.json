@@ -1,15 +1,39 @@
 {
-  "miniprogramRoot": "dist",
+  "miniprogramRoot": "dist/",
   "projectname": "customer-app",
   "description": "顾客小程序 - 扫码点餐系统",
-  "appid": "wx648d5e4c375826a7",
+  "appid": "wx00060455481f37a2",
   "setting": {
     "urlCheck": false,
     "es6": false,
     "enhance": true,
     "compileHotReLoad": false,
     "postcss": false,
-    "minified": false
+    "minified": false,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
-  "compileType": "miniprogram"
+  "compileType": "miniprogram",
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
 }
