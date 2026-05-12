@@ -1,6 +1,7 @@
 version: '1.0'
 name: wx_ci_0512A
 displayName: 微信小程序自动构建上传
+nodeVersion: v22.20.0
 triggers:
   trigger: auto
   push:
@@ -49,8 +50,9 @@ stages:
         displayName: Nodejs 构建
         nodeVersion: 24.5.0
         commands:
-          - '切换目录'
+          - 切换目录
           - cd customer-app && pwd
+          - node -v
           - '# 设置NPM源，提升安装速度'
           - npm config set registry https://registry.npmmirror.com
           - ''
