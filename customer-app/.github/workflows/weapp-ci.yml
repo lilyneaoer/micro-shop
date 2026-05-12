@@ -1,11 +1,10 @@
-name: 微信小程序自动发布
+name: 微信小程序自动构建发布
 
 on:
   push:
     branches:
-      - dev # 测试版
-      - main # 正式体验版
-  workflow_dispatch: # 允许手动触发
+      - dev
+      - main
 
 jobs:
   build-and-deploy:
@@ -18,7 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
 
       - name: 安装依赖
         run: npm install
@@ -27,12 +25,13 @@ jobs:
         run: npm run build:weapp
 
       - name: 安装CI工具
-        run: npm install miniprogram-ci qrcode axios --save-dev
+        run: npm install miniprogram-ci qrcode axios --save
 
-      - name: 自动上传 + 企微推送
+      - name: 上传体验版 + 推送企微
         env:
           WX_APPID: ${{ secrets.WX_APPID }}
           WX_PRIVATE_KEY: ${{ secrets.WX_PRIVATE_KEY }}
           WECOM_WEBHOOK: ${{ secrets.WECOM_WEBHOOK }}
-          GITHUB_COMMIT_MSG: ${{ github.event.head_commit.message }}
+          GITEE_REF: ${{ gitee.ref }}
+          GITEE_COMMIT_MSG: ${{ gitee.head_commit.message }}
         run: node scripts/ci-publish.js
